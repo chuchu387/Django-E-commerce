@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %} CheckOut {% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div>
+      <h3>Items in the cart</h3>
+        <a class="btn btn-danger" href="{% url 'ecomapp:mycart' %}">Update Cart</a>
+      <table class="table table-bordered table-striped" style="background-color: #e9f7ef;">
+                <thead style="background-color: #c3e6cb; color: #fff;">
+                <tr>
+                    <th>SN</th>
+                    <th>Product</th>
+                    <th>Rate</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for cp in cart.cartproduct_set.all %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ cp.product.title }}</td>
+                        <td>Rs. {{ cp.rate }}</td>
+                        <td>{{ cp.quantity }}</td>
+                        <td>Rs. {{ cp.subtotal }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr style="background-color: #d4edda; color: #155724;">
+                        <th colspan="4" class="text-right" >Total</th>
+                        <th>Rs. {{ cart.total }}</th>
+                    </tr>
+                </tbody>
+      </table>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title text-center">CheckOut Form</h3>
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-info btn-block">Place Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+</div>
+  </div>
+</div>
+{% endblock %}
