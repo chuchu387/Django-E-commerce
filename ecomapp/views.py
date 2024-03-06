@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views.generic import TemplateView, View, CreateView, FormView, \
     DetailView, ListView  # beacuse of i am using class generic view
-from .forms import CheckoutForm, CustomerRegistrationForm, CustomerLoginForm
+from .forms import CheckoutForm, CustomerRegistrationForm, CustomerLoginForm, ProductForm
 from django.urls import reverse_lazy, reverse
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -32,7 +32,7 @@ class HomeView(EcomMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         all_products = Product.objects.all().order_by("-id")
-        paginator = Paginator(all_products, 4)
+        paginator = Paginator(all_products, 8)
         page_number = self.request.GET.get("page")
         product_list = paginator.get_page(page_number)
         context['product_list'] = product_list
@@ -428,3 +428,23 @@ class SearchView(TemplateView):
         print(results)
         context['results'] = results
         return context
+
+
+class AdminProductListView(AdminRequiredMixin, ListView):
+    template_name = "adminpages/adminproductlist.html"
+    queryset = Product.objects.all().order_by("-id")
+    context_object_name = "allproducts"
+
+
+class AdminProductCreateView(AdminRequiredMixin, CreateView):
+    template_name = "adminpages/adminproductcreate.html"
+    form_class = ProductForm
+    success_url = reverse_lazy("ecomapp:adminproductlist")
+
+    #it is use to handle the multiples images form admin form
+    def form_valid(self, form):
+        p = form.save()
+        images = self.request.FILES.getlist("more_images")
+        for i in images:
+            ProductImage.objects.create(product=p, image=i)
+        return super().form_valid(form)

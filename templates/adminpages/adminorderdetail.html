@@ -14,8 +14,8 @@
           <p> {{ ord_obj.mobile }}</p>
           <p><span class="font-weight-bold">Shipping Address: </span> By {{ ord_obj.shipping_address }} </p>
           <p>({{ ord_obj.email }})</p>
-          <p><span class="font-weight-bold">Payment Information: </span> By Using {{ ord_obj.payment_m</p>
-          <p>ethod }} ({% if ord_obj.payment_completed %}Payment Completed{% else %}Not Paid{% endif %})</p>
+          <p><span class="font-weight-bold">Payment Information: </span> By Using {{ ord_obj.payment_method }}</p>
+          <p> ({% if ord_obj.payment_completed %}Payment Completed{% else %}Not Paid{% endif %})</p>
             <h4>Ordered Items</h4>
             <table class="table">
                 <thead>

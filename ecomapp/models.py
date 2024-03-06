@@ -55,6 +55,14 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to="products/images/")
+
+    def __str__(self):
+        return self.product.title
+
+
 
 #this means a customer may have many carts but a cart is of for only on customer
 #1. so i use null=True because i want unauthenticated user also can create cart or add product to the cart
