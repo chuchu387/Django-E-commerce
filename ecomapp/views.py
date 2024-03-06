@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect
 from django.views.generic import TemplateView, View, CreateView, FormView, \
     DetailView, ListView  # beacuse of i am using class generic view
 from .forms import CheckoutForm, CustomerRegistrationForm, CustomerLoginForm
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib.auth import login, logout, authenticate
+from django.http import JsonResponse
+import requests
 from .models import *
 
 
@@ -202,10 +204,53 @@ class CheckoutView(EcomMixin, CreateView):
             form.instance.total = cart_obj.total
             form.instance.order_status = "Order Received"
             del self.request.session['cart_id']
+            pm = form.cleaned_data.get("payment_method")
+            order = form.save()
+            if pm == "Khalti":
+                return redirect(reverse("ecomapp:khaltirequest") + "?o_id=" + str(order.id))
         else:
             return redirect("ecomapp:home")
         return super().form_valid(form)
 
+
+class KhaltiRequestView(View):
+    def get(self, request, *args, **kwargs):
+        o_id = request.GET.get("o_id")
+        order = Order.objects.get(id=o_id)
+        context = {
+            "order": order
+        }
+        return render(request, "khaltirequest.html", context)
+
+class KhaltiVerifyView(View):
+    def get(self, request, *args, **kwargs):
+        token = request.GET.get("token")
+        amount = request.GET.get("amount")
+        o_id = request.GET.get("order_id")
+        print(token, amount, o_id)
+
+        url = "https://khalti.com/api/v2/payment/verify/"
+        payload = {
+            "token": token,
+            "amount": amount
+        }
+        headers = {
+            "Authorization": "Key test_secret_key_f59e8b7d18b4499ca40f68195a846e9b"
+        }
+
+        order_obj = Order.objects.get(id=o_id)
+        response = request.post(url, payload, headers=headers)
+        resp_dict = response.json()
+        if resp_dict.get("idx"):
+            success = True
+            order_obj.payment_completed = True
+            order_obj.save()
+        else:
+            success = False
+        data = {
+            "success": True
+        }
+        return JsonResponse(data)
 
 class CustomerRegistrationView(CreateView):
     template_name = "customerregistration.html"
@@ -370,7 +415,6 @@ class AdminOrderStatusChangeView(AdminRequiredMixin, View):
         order_obj.order_status = new_status
         order_obj.save()
         return redirect(reverse_lazy("ecomapp:adminorderdetail", kwargs={"pk": order_id}))
-
 
 
 # logic behind search button
