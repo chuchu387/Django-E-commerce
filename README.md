@@ -1,4 +1,4 @@
-# Django-E-commerce
+# Django-E-commerce: BhookLagyao
 
 To run this project in your computer, follow the steps below
 -------------------------------------------------------------
@@ -11,8 +11,8 @@ Step 1. Make and activate virtual Environment in your computer
     $ source bin/activate
 
 Step 2. Clone the project
-    $ git clone https://gitlab.com/ecedreamer/ecomtuts.git
-    $ cd ecomapp
+    $ git clone https://github.com/chuchu387/Django-E-commerce.git
+    $ cd BhokLagyao
     if you donot have git in your computer, install it before and clone it again.
 
 Step 3: Install dependencies 
