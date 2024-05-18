@@ -12,7 +12,6 @@ Step 1. Make and activate virtual Environment in your computer
 
 Step 2. Clone the project
     $ git clone https://github.com/chuchu387/Django-E-commerce.git
-    $ cd BhokLagyao
     if you donot have git in your computer, install it before and clone it again.
 
 Step 3: Install dependencies 
