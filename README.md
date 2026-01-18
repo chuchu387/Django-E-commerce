@@ -69,6 +69,30 @@ python manage.py runserver
 
 Visit the app at: **http://127.0.0.1:8000/**
 
+## 🐳 Docker Setup
+
+### 1) Create an environment file
+
+```bash
+cp .env.example .env
+```
+
+Update values inside `.env` as needed (especially `DJANGO_SECRET_KEY`).
+
+### 2) Build and run
+
+```bash
+docker compose up --build
+```
+
+The app will be available at **http://localhost:8000/**.
+
+### 3) Run admin commands (optional)
+
+```bash
+docker compose exec web python manage.py createsuperuser
+```
+
 ## 🔐 Configuration
 
 This project uses settings in `ecomproject/settings.py`.
