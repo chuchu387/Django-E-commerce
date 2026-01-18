@@ -1,31 +1,109 @@
-# Django-E-commerce: BhookLagyao
+# Django E-commerce (BhookLagyao)
 
-To run this project in your computer, follow the steps below
--------------------------------------------------------------
-Step 1. Make and activate virtual Environment in your computer
-    In windows
-    > virtualenv ecom
-    > Scripts\activate
-    In mac and linux
-    $ virtualenv ecom
-    $ source bin/activate
+A full-stack Django e-commerce storefront with cart management, checkout, order tracking, and an admin dashboard for product and order operations.
 
-Step 2. Clone the project
-    $ git clone https://github.com/chuchu387/Django-E-commerce.git
-    if you donot have git in your computer, install it before and clone it again.
+## ✨ Highlights
 
-Step 3: Install dependencies 
-    $ pip install -r requirements.txt
-    or 
-    $ pip install django pillow requests six
+- **Product catalog** with categories, detail pages, and pagination.
+- **Cart & checkout** flow with quantity management and order summaries.
+- **Customer accounts** for registration, login, and order history.
+- **Admin dashboard** to manage orders, products, and statuses.
+- **Payment integration** scaffolded for Khalti (test key included).
+- **Search** across product titles and descriptions.
 
-Step 4: Apply the migration if any
-    $ python manage.py migrate
+## 🧱 Tech Stack
 
+- **Backend**: Django 5
+- **Database**: SQLite (default, easy local setup)
+- **Frontend**: Django templates + static assets
 
-Step 5: You can now open project folder in your editor
+## 📁 Project Structure
 
-Step 6: Run Development server
-    $ python manage.py runserver
+```
+Django-E-commerce/
+├── ecomapp/          # App models, views, urls, forms
+├── ecomproject/      # Project settings and URLs
+├── templates/        # HTML templates
+├── static/           # Static assets (CSS, JS, images)
+├── media/            # Uploaded media files
+└── db.sqlite3        # Local database (dev)
+```
 
-Thank You 😊
+## ✅ Quick Start
+
+### 1) Create and activate a virtual environment
+
+```bash
+# Windows
+python -m venv .venv
+.venv\Scripts\activate
+
+# macOS / Linux
+python -m venv .venv
+source .venv/bin/activate
+```
+
+### 2) Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3) Apply migrations
+
+```bash
+python manage.py migrate
+```
+
+### 4) Create an admin user (optional but recommended)
+
+```bash
+python manage.py createsuperuser
+```
+
+### 5) Run the development server
+
+```bash
+python manage.py runserver
+```
+
+Visit the app at: **http://127.0.0.1:8000/**
+
+## 🔐 Configuration
+
+This project uses settings in `ecomproject/settings.py`.
+
+### Email settings (password reset)
+Update these values if you want password reset emails to work:
+
+```python
+EMAIL_HOST_USER = "yourmail@gmail.com"
+EMAIL_HOST_PASSWORD = "yourpassword"
+```
+
+### Khalti payment
+A test key is embedded in `ecomapp/views.py` for the demo payment flow. Replace it with your own key in production.
+
+## 🔍 Key Routes
+
+- `/` — Home (latest products)
+- `/all-products/` — Product listing
+- `/product/<slug>/` — Product detail
+- `/my-cart/` — Cart view
+- `/checkout/` — Checkout flow
+- `/profile/` — Customer profile & orders
+- `/admin-login/` — Admin login
+- `/admin-home/` — Admin dashboard
+
+## 🧪 Tests
+
+No automated tests are currently configured.
+
+## 📝 Notes
+
+- Static files are served from `/static/` and media uploads from `/media/`.
+- For production, update `DEBUG`, `ALLOWED_HOSTS`, and secrets.
+
+---
+
+Built with ❤️ using Django.
