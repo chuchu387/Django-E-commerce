@@ -7,11 +7,6 @@ services:
     ports:
       - "8000:8000"
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
     volumes:
       - static-data:/app/static_cdn
       - media-data:/app/media
