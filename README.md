@@ -99,6 +99,17 @@ docker compose exec web python manage.py createsuperuser
 
 This project uses settings in `ecomproject/settings.py`.
 
+## 🚀 Vercel Deployment
+
+This repo includes a GitHub Actions job that deploys to Vercel on every push
+to `main`. To enable it, add the following repository secrets:
+
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
+
+You can find the org and project IDs in your Vercel project settings.
+
 ### Email settings (password reset)
 Update these values if you want password reset emails to work:
 
