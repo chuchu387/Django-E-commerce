@@ -110,6 +110,7 @@ to `main`. To enable it, add the following repository secrets:
 
 You can find the org and project IDs in your Vercel project settings.
 
+
 ### Email settings (password reset)
 Update these values if you want password reset emails to work:
 
