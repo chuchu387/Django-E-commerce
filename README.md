@@ -69,9 +69,58 @@ python manage.py runserver
 
 Visit the app at: **http://127.0.0.1:8000/**
 
+## 🐳 Docker Setup
+
+### 1) Create an environment file
+
+```bash
+cp .env.example .env
+```
+
+Update values inside `.env` as needed (especially `DJANGO_SECRET_KEY`).
+You can disable migrations or static collection by setting `DJANGO_RUN_MIGRATIONS=0`
+or `DJANGO_COLLECTSTATIC=0`.
+
+### 2) Build and run
+
+```bash
+docker compose up --build
+```
+
+The app will be available at **http://localhost:8000/**.
+
+### 3) Run admin commands (optional)
+
+```bash
+docker compose exec web python manage.py createsuperuser
+```
+
 ## 🔐 Configuration
 
 This project uses settings in `ecomproject/settings.py`.
+
+## 🚀 Vercel Deployment
+
+This repo includes a GitHub Actions job that deploys to Vercel on every push
+to `main`. To enable it, add the following repository secrets:
+
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
+
+You can find the org and project IDs in your Vercel project settings.
+
+## 🌐 GitHub Pages Deployment
+
+This repo includes a GitHub Actions workflow that deploys the contents of
+`docs/` to GitHub Pages on every push to `main`.
+
+1) Enable GitHub Pages for the repository:
+   - Repo **Settings** → **Pages**
+   - Source: **GitHub Actions**
+2) Commit your static site output into `docs/` (or replace the placeholder
+   `docs/index.html`).
+3) Push to `main` and the pipeline will publish the site automatically.
 
 ### Email settings (password reset)
 Update these values if you want password reset emails to work:
