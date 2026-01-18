@@ -110,17 +110,6 @@ to `main`. To enable it, add the following repository secrets:
 
 You can find the org and project IDs in your Vercel project settings.
 
-## 🌐 GitHub Pages Deployment
-
-This repo includes a GitHub Actions workflow that deploys the contents of
-`docs/` to GitHub Pages on every push to `main`.
-
-1) Enable GitHub Pages for the repository:
-   - Repo **Settings** → **Pages**
-   - Source: **GitHub Actions**
-2) Commit your static site output into `docs/` (or replace the placeholder
-   `docs/index.html`).
-3) Push to `main` and the pipeline will publish the site automatically.
 
 ### Email settings (password reset)
 Update these values if you want password reset emails to work:
