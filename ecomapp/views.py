@@ -4,7 +4,7 @@ from django.views.generic import TemplateView, View, CreateView, FormView, \
 from .forms import *
 from django.urls import reverse_lazy, reverse
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, F
 from django.contrib.auth import login, logout, authenticate
 from django.http import JsonResponse
 from .utils import password_reset_token
@@ -58,10 +58,12 @@ class ProductDetailView(EcomMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         url_slug = self.kwargs['slug']
-        product = Product.objects.get(slug=url_slug)
+        product = Product.objects.select_related("category").prefetch_related(
+            "productimage_set"
+        ).get(slug=url_slug)
         context['product'] = product
+        Product.objects.filter(pk=product.pk).update(view_count=F("view_count") + 1)
         product.view_count += 1
-        product.save()
         # print(slug, "99999999")
         return context
 
@@ -122,7 +124,9 @@ class MyCartView(EcomMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         cart_id = self.request.session.get("cart_id", None)
         if cart_id:
-            cart = Cart.objects.get(id=cart_id)
+            cart = Cart.objects.prefetch_related(
+                "cartproduct_set__product"
+            ).get(id=cart_id)
         else:
             cart = None
 
@@ -346,12 +350,17 @@ class CustomerOrderDetailView(DetailView):
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated and Customer.objects.filter(user=request.user).exists():
             order_id = self.kwargs["pk"]
-            order = Order.objects.get(id=order_id)
+            order = Order.objects.select_related("cart__customer").get(id=order_id)
             if request.user.customer != order.cart.customer:
                 return redirect("ecomapp:customerprofile")
         else:
             return redirect("/login/?next=/profile/")
         return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("cart").prefetch_related(
+            "cart__cartproduct_set__product"
+        )
 
 
 # logic for admin pages
@@ -459,6 +468,11 @@ class AdminOrderDetailView(AdminRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['allstatus'] = ORDER_STATUS
         return context
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("cart").prefetch_related(
+            "cart__cartproduct_set__product"
+        )
 
 
 class AdminOrderListView(AdminRequiredMixin, ListView):
