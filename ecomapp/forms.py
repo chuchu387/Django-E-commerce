@@ -1,15 +1,20 @@
-from django import forms
-from .models import Order, Customer, Product
 from django.contrib.auth.models import User
+from django import forms
+
+from .models import Customer, Order, Product
 
 
 class CheckoutForm(forms.ModelForm):
+    """Collects checkout details for an order."""
+
     class Meta:
         model = Order
         fields = ["ordered_by", "shipping_address", "mobile", "email", "payment_method"]
 
 
 class CustomerRegistrationForm(forms.ModelForm):
+    """Registers a new customer profile with a linked User."""
+
     username = forms.CharField(widget=forms.TextInput())
     password = forms.CharField(widget=forms.PasswordInput())
     email = forms.CharField(widget=forms.EmailInput())
@@ -26,11 +31,15 @@ class CustomerRegistrationForm(forms.ModelForm):
 
 
 class CustomerLoginForm(forms.Form):
+    """Simple login form for customer credentials."""
+
     username = forms.CharField(widget=forms.TextInput())
     password = forms.CharField(widget=forms.PasswordInput())
 
 
 class ProductForm(forms.ModelForm):
+    """Admin form to create products with optional extra images."""
+
     more_images = forms.FileField(required=False, widget=forms.FileInput(attrs={
         "class": "form-control"
     }))
@@ -70,6 +79,8 @@ class ProductForm(forms.ModelForm):
 
 
 class PasswordForgotForm(forms.Form):
+    """Collects the email used for password reset."""
+
     email = forms.CharField(widget=forms.EmailInput(attrs={
         "class": "form-control",
         "placeholder": "Enter the email used in customer account"
@@ -86,6 +97,8 @@ class PasswordForgotForm(forms.Form):
 
 
 class PasswordResetForm(forms.Form):
+    """Collects and validates a new password."""
+
     new_password = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control',
         'autocomplete': 'new-password',
