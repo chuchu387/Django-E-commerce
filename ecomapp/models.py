@@ -1,10 +1,12 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 
 
 # Create your models here.
 
 class Admin(models.Model):
+    """Admin profile data connected to Django's built-in User."""
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=50)
     image = models.ImageField(upload_to="admins")
@@ -14,6 +16,8 @@ class Admin(models.Model):
         return self.user.username
 
 class Customer(models.Model):
+    """Customer profile data connected to Django's built-in User."""
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=200)
     address = models.CharField(max_length=200, null=True, blank=True)
@@ -25,7 +29,9 @@ class Customer(models.Model):
         return self.full_name
 
 
-class Category(models.Model): #this Model calss is inheriated in this category class.
+class Category(models.Model):
+    """Product grouping for browsing and filtering."""
+
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
 
@@ -35,6 +41,8 @@ class Category(models.Model): #this Model calss is inheriated in this category c
 
 
 class Product(models.Model):
+    """Sellable product with pricing and category information."""
+
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
 
@@ -56,6 +64,8 @@ class Product(models.Model):
         return self.title
 
 class ProductImage(models.Model):
+    """Additional images linked to a product."""
+
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     image = models.ImageField(upload_to="products/images/")
 
@@ -68,6 +78,8 @@ class ProductImage(models.Model):
 #1. so i use null=True because i want unauthenticated user also can create cart or add product to the cart
 #2. it means no login is required while creating the cart or adding products to the cart
 class Cart(models.Model):
+    """Shopping cart that can belong to an authenticated customer or guest."""
+
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     total = models.PositiveIntegerField(default=0)
 
@@ -76,11 +88,12 @@ class Cart(models.Model):
 
     #it return cart and cartID
     def __str__(self):
-        return "Cart: " + str(self.id)
+        return f"Cart: {self.id}"
 
 #CartProduct is different form product
 #1. if user put product in cart that is actually cart product
 class CartProduct(models.Model):
+    """A product added to a cart with quantity and subtotal."""
 
     #this Foreignkey implies that a Cart may have many cart product
     #1. if user delete the cart all the cartproduct related to that cart is deleted
@@ -95,7 +108,7 @@ class CartProduct(models.Model):
     #2. cart means the cart object => cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     #3. id means the Cart ID
     def __str__(self):
-        return "Product: " + str(self.cart.id) + "CartProduct: " + str(self.id)
+        return f"Product: {self.cart.id} CartProduct: {self.id}"
 
 ORDER_STATUS = (
     ("Order Recieved", "Order Recieved"),
@@ -112,6 +125,8 @@ METHOD = (
 
 #is cart is cheackedout then order must be stored in order table
 class Order(models.Model):
+    """Checkout record created from a cart."""
+
     cart = models.OneToOneField(Cart, on_delete=models.CASCADE)
     ordered_by = models.CharField(max_length=200)
     shipping_address = models.CharField(max_length=200)
