@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.db.models import F, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -102,48 +103,37 @@ class AddToCartView(EcomMixin, TemplateView):
 
         # get product
         product_obj = get_object_or_404(Product, id=product_id)
+        price = product_obj.selling_price
 
-        # check if cart exist i use session
-        cart_id = self.request.session.get("cart_id", None)
-        if cart_id:
-            # if cart id exist we need to fetch that cart id
-            cart_obj = Cart.objects.get(id=cart_id)
-            this_product_in_cart = cart_obj.cartproduct_set.filter(product=product_obj)
+        with transaction.atomic():
+            cart_id = self.request.session.get("cart_id")
+            cart_obj = None
+            if cart_id:
+                try:
+                    cart_obj = Cart.objects.select_for_update().get(id=cart_id)
+                except Cart.DoesNotExist:
+                    self.request.session.pop("cart_id", None)
 
-            # items already exist in cart
-            if this_product_in_cart.exists():
-                cartproduct = this_product_in_cart.last()
-                cartproduct.quantity += 1
-                cartproduct.subtotal += product_obj.selling_price
-                cartproduct.save(update_fields=["quantity", "subtotal"])
-                cart_obj.total += product_obj.selling_price
-                cart_obj.save(update_fields=["total"])
+            if cart_obj is None:
+                cart_obj = Cart.objects.create(total=0)
+                # Store the cart id immediately so future cart actions reuse it.
+                self.request.session['cart_id'] = cart_obj.id
 
-            # new item is added in cart
-            else:
-                CartProduct.objects.create(
-                    cart=cart_obj,
-                    product=product_obj,
-                    rate=product_obj.selling_price,
-                    quantity=1,
-                    subtotal=product_obj.selling_price,
-                )
-                cart_obj.total += product_obj.selling_price
-                cart_obj.save(update_fields=["total"])
-        else:
-            # id cart id doesn't exist in our session we need to create a new cart
-            cart_obj = Cart.objects.create(total=0)
-            # Store the cart id immediately so future cart actions reuse it.
-            self.request.session['cart_id'] = cart_obj.id
-            CartProduct.objects.create(
+            cart_product, created = CartProduct.objects.select_for_update().get_or_create(
                 cart=cart_obj,
                 product=product_obj,
-                rate=product_obj.selling_price,
-                quantity=1,
-                subtotal=product_obj.selling_price,
+                defaults={
+                    "rate": price,
+                    "quantity": 1,
+                    "subtotal": price,
+                },
             )
-            cart_obj.total += product_obj.selling_price
-            cart_obj.save(update_fields=["total"])
+            if not created:
+                CartProduct.objects.filter(id=cart_product.id).update(
+                    quantity=F("quantity") + 1,
+                    subtotal=F("subtotal") + price,
+                )
+            Cart.objects.filter(id=cart_obj.id).update(total=F("total") + price)
 
         return context
 
