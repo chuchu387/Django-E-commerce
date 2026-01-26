@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import F, Q
+from django.db.models import F, Prefetch, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -66,11 +66,11 @@ class AllProductsView(EcomMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        all_products = Product.objects.select_related("category").order_by("-id")
-        paginator = Paginator(all_products, 12)
-        page_number = self.request.GET.get("page")
-        product_list = paginator.get_page(page_number)
-        context["product_list"] = product_list
+        products_qs = Product.objects.select_related("category").order_by("-id")
+        categories = Category.objects.prefetch_related(
+            Prefetch("product_set", queryset=products_qs, to_attr="prefetched_products")
+        ).order_by("title")
+        context["categories"] = categories
         return context
 
 
