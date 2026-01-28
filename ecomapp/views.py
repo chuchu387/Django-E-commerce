@@ -161,28 +161,30 @@ class ManageCartView(EcomMixin, View):
     def get(self, request, *args, **kwargs):
         cp_id = self.kwargs['cp_id']
         action = request.GET.get('action')
-        cp_obj = CartProduct.objects.select_related("cart").get(id=cp_id)
-        cart_obj = cp_obj.cart
-        if action == "inc":
-            cp_obj.quantity += 1
-            cp_obj.subtotal += cp_obj.rate
-            cp_obj.save(update_fields=["quantity", "subtotal"])
-            cart_obj.total += cp_obj.rate
-            cart_obj.save(update_fields=["total"])
-        elif action == "dcr":
-            cp_obj.quantity -= 1
-            cp_obj.subtotal -= cp_obj.rate
-            cp_obj.save(update_fields=["quantity", "subtotal"])
-            cart_obj.total -= cp_obj.rate
-            cart_obj.save(update_fields=["total"])
-            if cp_obj.quantity == 0:
+        # Lock rows to prevent concurrent updates from corrupting totals.
+        with transaction.atomic():
+            cp_obj = CartProduct.objects.select_for_update().select_related("cart").get(id=cp_id)
+            cart_obj = cp_obj.cart
+            if action == "inc":
+                CartProduct.objects.filter(id=cp_obj.id).update(
+                    quantity=F("quantity") + 1,
+                    subtotal=F("subtotal") + cp_obj.rate,
+                )
+                Cart.objects.filter(id=cart_obj.id).update(total=F("total") + cp_obj.rate)
+            elif action == "dcr":
+                # Remove the line entirely once it reaches zero.
+                if cp_obj.quantity <= 1:
+                    Cart.objects.filter(id=cart_obj.id).update(total=F("total") - cp_obj.rate)
+                    cp_obj.delete()
+                else:
+                    CartProduct.objects.filter(id=cp_obj.id).update(
+                        quantity=F("quantity") - 1,
+                        subtotal=F("subtotal") - cp_obj.rate,
+                    )
+                    Cart.objects.filter(id=cart_obj.id).update(total=F("total") - cp_obj.rate)
+            elif action == "rmv":
+                Cart.objects.filter(id=cart_obj.id).update(total=F("total") - cp_obj.subtotal)
                 cp_obj.delete()
-        elif action == "rmv":
-            cart_obj.total -= cp_obj.subtotal
-            cart_obj.save(update_fields=["total"])
-            cp_obj.delete()
-        else:
-            pass
         return redirect("ecomapp:mycart")
 
 

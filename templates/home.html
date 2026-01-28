@@ -36,9 +36,8 @@
             <span>
               BhokLagyao
             </span>
-
           </a>
-            <p style="color:white;">You hungery, Patner</p>
+          <p class="header_tagline">Hungry? Your next meal is moments away.</p>
           <div class="" id="">
             <div class="User_option">
                 <a style="text-align: center; display: block;" class="text-decoration-none" href="{% url 'ecomapp:home' %}"  >welcome {{request.user.username}}!</a>
@@ -68,30 +67,26 @@
         </nav>
       </div>
     </header>
-    <section class="slider_section ">
+    <section class="slider_section hero_section">
       <div class="container ">
         <div class="row">
           <div class="col-lg-10 mx-auto">
             <div class="detail-box">
-              <h1>
-                Discover Cusines And Food
-              </h1>
-              <p>
-                when looking at Our Platform BHOKLAGYAO
-              </p>
+              <h1>Discover cuisines you'll love</h1>
+              <p>Browse curated menus, trending dishes, and local favorites.</p>
             </div>
-            <div class="find_container ">
+            <div class="find_container hero_search">
               <div class="container">
                 <div class="row">
                   <div class="col">
                     <form action="{% url 'ecomapp:search' %}" method="get">
                       <div class="form-row ">
                         <div class="form-group col-lg-5">
-                          <input type="text" class="form-control" id="inputHotel" placeholder="Search Cusines" name="search" required>
+                          <input type="text" class="form-control" id="inputHotel" placeholder="Search cuisines" name="search" required>
                         </div>
                         <div class="form-group col-lg-3">
                           <div class="btn-box">
-                            <button type="submit" class="btn ">Search</button>
+                            <button type="submit" class="btn hero_search-btn">Search</button>
                           </div>
                         </div>
                       </div>
@@ -152,45 +147,55 @@
 
   <!-- recipe section -->
 
-  <section class="recipe_section layout_padding-top">
+  <section class="recipe_section layout_padding-top popular_section">
     <div class="container">
       <div class="heading_container heading_center">
-        <h2>
-          Our Best Popular
-        </h2>
+        <h2>Popular picks</h2>
+        <p class="section_subtitle">Fast, fresh, and delivered with care.</p>
       </div>
-              <div class="container">
-            <div class="row mt-3">
-                {% for p in product_list %}
-                <div class="col-md-3 card mb-3 style='margin-right: 10px; margin-bottom: 10px;'">
-                    <div class="m-4">
-                        <h4 class="text-center"><a class="text-decoration-none" href="{% url 'ecomapp:productdetail' p.slug %}">{{ p.title }}</a></h4>
-                        <img src="{{ p.image.url }}" alt="" width="200" class="img-fluid" style="height:200px; object-fit:cover;">
-                        <p class="mt-3">Price: <strike>Rs. {{p.marked_price}}</strike> Rs. {{p.selling_price}}</p>
-                        <div class="text-center">
-                                <a href="{% url 'ecomapp:addtocart' p.id %}" class="btn btn-primary ">Order Now</a>
-                        </div>
-                    </div>
+      <div class="container">
+        <div class="row mt-3 g-4">
+          {% for p in product_list %}
+          <div class="col-sm-6 col-lg-3">
+            <div class="card product_card h-100">
+              <div class="product_image-wrapper">
+                <a href="{% url 'ecomapp:productdetail' p.slug %}">
+                  <img src="{{ p.image.url }}" alt="{{ p.title }}" class="img-fluid">
+                </a>
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h4 class="product_title text-center">
+                  <a class="text-decoration-none" href="{% url 'ecomapp:productdetail' p.slug %}">{{ p.title }}</a>
+                </h4>
+                <p class="product_price mt-3 text-center">
+                  <span class="text-muted">Rs. <strike>{{ p.marked_price }}</strike></span>
+                  <strong class="text-primary">Rs. {{ p.selling_price }}</strong>
+                </p>
+                <div class="text-center mt-auto">
+                  <a href="{% url 'ecomapp:addtocart' p.id %}" class="btn btn-primary product_cta">Order Now</a>
                 </div>
-                {% endfor %}
+              </div>
             </div>
-            <div class="pagination">
-                <span class="step-links">
-                    {% if product_list.has_previous %}
-                        <a href="?page=1">&laquo; first</a>
-                        <a href="?page={{ product_list.previous_page_number }}">previous</a>
-                    {% endif %}
-
-                    <span class="current">
-                        Page {{ product_list.number }} of {{ product_list.pagination.num_pages }}
-                    </span>
-                    {% if product_list.has_next %}
-                        <a href="?page={{ product_list.next_page_number }}">next</a>
-                        <a href="?page={{ product_list.paginator.num_pages }}">last &raquo;</a>
-                    {% endif %}
-                </span>
-            </div>
+          </div>
+          {% endfor %}
         </div>
+        <div class="pagination product_pagination">
+          <span class="step-links">
+            {% if product_list.has_previous %}
+              <a href="?page=1">&laquo; first</a>
+              <a href="?page={{ product_list.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+              Page {{ product_list.number }} of {{ product_list.paginator.num_pages }}
+            </span>
+            {% if product_list.has_next %}
+              <a href="?page={{ product_list.next_page_number }}">next</a>
+              <a href="?page={{ product_list.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+          </span>
+        </div>
+      </div>
       <div class="btn-box">
         <a href="{% url 'ecomapp:allproducts' %}">
           Order Now
@@ -435,6 +440,5 @@
   <script src="/static/js/custom.js"></script>
 </body>
 </html>
-
 
 
