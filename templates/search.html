@@ -1,46 +1,40 @@
 {% extends 'base.html' %}
-{% block title %}Search {% endblock %}
+{% block title %}Search{% endblock %}
+
 {% block content %}
-<style>
-  /* Style to remove underlines from links */
-  .title-link {
-    text-decoration: none; /* Remove underlines */
-    color: inherit; /* Inherit text color */
-  }
-
-  .image-box {
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    transition: 0.3s;
-    border-radius: 5px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-
-  .image-box:hover {
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-  }
-</style>
-
 <div class="container">
-  <div class="row">
-    <div class="col-md-12">
-      <h3>Search Cuisines for <span class="text-info">"{{request.GET.search}}"</span></h3><hr>
-      {% for result in results %}
-      <div class="row">
-        <div class="col-md-4">
-          <div class="image-box">
-            <img src="{{result.image.url}}" class="img-fluid" alt="">
+  <div class="mb-4">
+    <h1 class="page-title mb-1">Search Results</h1>
+    <p class="text-muted mb-0">Showing cuisines for "{{ request.GET.search }}"</p>
+  </div>
+
+  <div class="row g-4">
+    {% for result in results %}
+      <div class="col-12">
+        <article class="card border-0 p-3 p-md-4">
+          <div class="row g-3 align-items-center">
+            <div class="col-md-4">
+              <img src="{{ result.image.url }}" class="img-fluid rounded-4 search-image" alt="{{ result.title }}">
+            </div>
+            <div class="col-md-8">
+              <h2 class="h4 mb-2"><a href="{% url 'ecomapp:productdetail' result.slug %}" class="text-decoration-none">{{ result.title }}</a></h2>
+              <p class="text-muted mb-3">{{ result.description|truncatechars:170 }}</p>
+              <p class="product_price mb-3">
+                <small class="text-muted text-decoration-line-through me-2">Rs. {{ result.marked_price }}</small>
+                <strong>Rs. {{ result.selling_price }}</strong>
+              </p>
+              <a href="{% url 'ecomapp:addtocart' result.id %}" class="btn btn-primary">Add to Cart</a>
+            </div>
           </div>
-        </div>
-        <div class="col-md-8">
-          <h4><a href="{% url 'ecomapp:productdetail' result.slug %}" class="title-link">{{result.title}}</a></h4>
-          <p>{{result.description}}</p>
-          <p>Price:<strike>Rs. {{result.marked_price}}</strike> Rs.{{result.selling_price}}</p>
-          <a href="{% url 'ecomapp:addtocart' result.id %}" class="btn btn-primary">Add To Cart / Order Now</a>
+        </article>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="card border-0 p-4 text-center">
+          <p class="text-muted mb-0">No matching cuisines found. Try another keyword.</p>
         </div>
       </div>
-      {% endfor %}
-    </div>
+    {% endfor %}
   </div>
 </div>
 {% endblock %}
