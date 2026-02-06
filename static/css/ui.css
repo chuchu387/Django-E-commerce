@@ -341,3 +341,77 @@ section {
   width: 100%;
   object-fit: cover;
 }
+
+/* Refreshed global UI layer */
+:root {
+  --ui-navy: #0b1220;
+}
+
+main {
+  background:
+    radial-gradient(circle at top right, rgba(79, 70, 229, 0.08), transparent 35%),
+    radial-gradient(circle at top left, rgba(255, 123, 57, 0.1), transparent 32%);
+}
+
+.main-navbar {
+  background: linear-gradient(120deg, #0b1220, #1f2937);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-search-btn {
+  border-radius: 999px;
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.site-footer {
+  background: var(--ui-navy);
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.site-footer .footer-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.site-footer .footer-link:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(4px);
+}
+
+.table thead th {
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #334155;
+}
+
+.pagination .current {
+  display: inline-block;
+  margin: 0 0.75rem;
+  color: #334155;
+}
+
+.pagination a {
+  text-decoration: none;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: #eef2ff;
+}
+
+.hero_section .detail-box {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 24px;
+  padding: 2rem;
+  backdrop-filter: blur(8px);
+}
+
+.box-img {
+  border-radius: 16px;
+}
