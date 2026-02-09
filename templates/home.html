@@ -95,6 +95,15 @@
                 </div>
               </div>
             </div>
+            <div class="hero_quick-filters">
+              <span class="hero_quick-label">Popular searches:</span>
+              <div class="hero_quick-links">
+                <a class="hero_filter-link" href="{% url 'ecomapp:search' %}?search=Pizza">Pizza</a>
+                <a class="hero_filter-link" href="{% url 'ecomapp:search' %}?search=Burger">Burgers</a>
+                <a class="hero_filter-link" href="{% url 'ecomapp:search' %}?search=Healthy">Healthy bowls</a>
+                <a class="hero_filter-link" href="{% url 'ecomapp:search' %}?search=Dessert">Desserts</a>
+              </div>
+            </div>
             <div class="hero_highlights">
               <span class="hero_highlight">30-min delivery</span>
               <span class="hero_highlight">Live order tracking</span>
@@ -127,6 +136,20 @@
                   <h3>Top rated</h3>
                   <p>Only the best-rated kitchens nearby.</p>
                 </div>
+              </div>
+            </div>
+            <div class="hero_stats">
+              <div class="hero_stat-card">
+                <h4 class="hero_stat-value">500+</h4>
+                <p class="hero_stat-label">Partner restaurants</p>
+              </div>
+              <div class="hero_stat-card">
+                <h4 class="hero_stat-value">4.8/5</h4>
+                <p class="hero_stat-label">Average customer rating</p>
+              </div>
+              <div class="hero_stat-card">
+                <h4 class="hero_stat-value">25k+</h4>
+                <p class="hero_stat-label">Meals delivered weekly</p>
               </div>
             </div>
           </div>
@@ -187,6 +210,29 @@
         <h2>Popular picks</h2>
         <p class="section_subtitle">Fast, fresh, and delivered with care.</p>
       </div>
+      <div class="service_strip">
+        <div class="service_card">
+          <span class="service_icon"><i class="fa fa-bolt" aria-hidden="true"></i></span>
+          <div>
+            <h3>Instant reorder</h3>
+            <p>Repeat your favorites with one tap.</p>
+          </div>
+        </div>
+        <div class="service_card">
+          <span class="service_icon"><i class="fa fa-shield" aria-hidden="true"></i></span>
+          <div>
+            <h3>Secure payments</h3>
+            <p>Protected checkout with multiple wallets.</p>
+          </div>
+        </div>
+        <div class="service_card">
+          <span class="service_icon"><i class="fa fa-cutlery" aria-hidden="true"></i></span>
+          <div>
+            <h3>Diet friendly</h3>
+            <p>Vegan, gluten-free, and keto options.</p>
+          </div>
+        </div>
+      </div>
       <div class="container">
         <div class="row mt-3 g-4">
           {% for p in product_list %}
@@ -234,6 +280,37 @@
         <a href="{% url 'ecomapp:allproducts' %}">
           Order Now
         </a>
+      </div>
+    </div>
+  </section>
+  <section class="steps_section layout_padding">
+    <div class="container">
+      <div class="heading_container heading_center">
+        <h2>How it works</h2>
+        <p class="section_subtitle">A seamless journey from craving to delivery.</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="steps_card">
+            <div class="steps_badge">1</div>
+            <h3>Pick your meal</h3>
+            <p>Browse menus, dietary tags, and crowd favorites.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="steps_card">
+            <div class="steps_badge">2</div>
+            <h3>Customize &amp; pay</h3>
+            <p>Adjust spice levels and pay in seconds.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="steps_card">
+            <div class="steps_badge">3</div>
+            <h3>Track delivery</h3>
+            <p>See your rider in real time until arrival.</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>

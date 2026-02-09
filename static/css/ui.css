@@ -200,8 +200,112 @@ section {
   box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
 }
 
+.hero_quick-filters {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.hero_quick-label {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.hero_quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.hero_filter-link {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.35rem 0.95rem;
+  background: #fff7ed;
+  border: 1px solid rgba(249, 115, 22, 0.2);
+  color: #9a3412;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero_filter-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(249, 115, 22, 0.18);
+}
+
+.hero_stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.hero_stat-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+}
+
+.hero_stat-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  color: #0f172a;
+}
+
+.hero_stat-label {
+  margin: 0;
+  color: var(--ui-muted);
+  font-weight: 500;
+}
+
 .popular_section {
   background: linear-gradient(180deg, rgba(248, 250, 252, 0.9), #ffffff);
+}
+
+.service_strip {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.service_card {
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 1.25rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+}
+
+.service_icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: rgba(79, 70, 229, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #4f46e5;
+  font-size: 1.2rem;
+}
+
+.service_card h3 {
+  font-size: 1.05rem;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+}
+
+.service_card p {
+  margin: 0;
+  color: var(--ui-muted);
 }
 
 .product_card {
@@ -260,6 +364,31 @@ section {
   border-radius: 24px;
   padding: 2.5rem;
   box-shadow: var(--ui-shadow);
+}
+
+.steps_section {
+  background: #ffffff;
+}
+
+.steps_card {
+  background: #f8fafc;
+  border-radius: 22px;
+  padding: 2rem;
+  height: 100%;
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+}
+
+.steps_badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: rgba(255, 123, 57, 0.15);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--ui-primary-dark);
+  margin-bottom: 1rem;
 }
 
 .about_section .box,
