@@ -947,6 +947,55 @@ a:focus {
   color: #676767;
 }
 
+
+.category_nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.category_chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #fff;
+  color: #333;
+  border: 1px solid #f0d8c9;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+  transition: all 0.2s ease;
+}
+
+.category_chip:hover {
+  color: #ff6a20;
+  border-color: #ffb086;
+  transform: translateY(-1px);
+}
+
+.category_chip-count {
+  min-width: 24px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fff1e7;
+  color: #ff6a20;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.category_count-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 12px;
+  background: #fff1e7;
+  color: #ff6a20;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
 .product_card {
   border: none;
   border-radius: 20px;
