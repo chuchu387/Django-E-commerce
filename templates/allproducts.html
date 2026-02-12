@@ -8,10 +8,23 @@
     <p class="text-muted mb-0">Freshly curated cuisines across all categories.</p>
   </div>
 
+  <nav class="category_nav mb-4" aria-label="Product categories">
+    {% for category in categories %}
+      {% if category.prefetched_products %}
+        <a class="category_chip" href="#category-{{ category.id }}">
+          {{ category.title }} <span class="category_chip-count">{{ category.prefetched_products|length }}</span>
+        </a>
+      {% endif %}
+    {% endfor %}
+  </nav>
+
   {% for category in categories %}
     {% if category.prefetched_products %}
-      <section class="mb-5">
-        <h2 class="h4 mb-3">{{ category.title }}</h2>
+      <section class="mb-5" id="category-{{ category.id }}">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+          <h2 class="h4 mb-0">{{ category.title }}</h2>
+          <span class="category_count-badge">{{ category.prefetched_products|length }} items</span>
+        </div>
         <div class="row g-4">
           {% for p in category.prefetched_products %}
             <div class="col-sm-6 col-lg-4">
