@@ -18,29 +18,29 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="{% url 'ecomapp:home' %}"><i class="fa fa-home me-1"></i>Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'ecomapp:allproducts' %}"><i class="fa fa-list me-1"></i>Categories</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'ecomapp:mycart' %}"><i class="fa fa-shopping-cart me-1"></i>Cart</a></li>
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 navbar-links">
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'home' %}is-active{% endif %}" href="{% url 'ecomapp:home' %}"><i class="fa fa-home me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'allproducts' %}is-active{% endif %}" href="{% url 'ecomapp:allproducts' %}"><i class="fa fa-list me-1"></i>Categories</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'mycart' %}is-active{% endif %}" href="{% url 'ecomapp:mycart' %}"><i class="fa fa-shopping-cart me-1"></i>Cart</a></li>
         {% if request.user.customer %}
-          <li class="nav-item"><a class="nav-link" href="{% url 'ecomapp:customerprofile' %}"><i class="fa fa-user me-1"></i>My Profile</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'customerprofile' %}is-active{% endif %}" href="{% url 'ecomapp:customerprofile' %}"><i class="fa fa-user me-1"></i>My Profile</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'ecomapp:customerlogout' %}"><i class="fa fa-sign-out-alt me-1"></i>Logout</a></li>
         {% else %}
-          <li class="nav-item"><a class="nav-link" href="{% url 'ecomapp:customerregistration' %}"><i class="fa fa-user-plus me-1"></i>Register</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'ecomapp:customerlogin' %}"><i class="fa fa-sign-in-alt me-1"></i>Login</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'customerregistration' %}is-active{% endif %}" href="{% url 'ecomapp:customerregistration' %}"><i class="fa fa-user-plus me-1"></i>Register</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'customerlogin' %}is-active{% endif %}" href="{% url 'ecomapp:customerlogin' %}"><i class="fa fa-sign-in-alt me-1"></i>Login</a></li>
         {% endif %}
       </ul>
 
       <div class="d-flex align-items-center gap-3 flex-wrap me-lg-3 mb-2 mb-lg-0 text-light small">
         {% if request.user.is_authenticated %}
-          <span class="d-inline-flex align-items-center"><i class="fa fa-bell me-2"></i>Welcome {{ request.user.username }}!</span>
+          <span class="d-inline-flex align-items-center user-pill"><i class="fa fa-bell me-2"></i>Welcome {{ request.user.username }}!</span>
         {% endif %}
-        <a class="nav-link p-0 text-light" href="{% url 'ecomapp:about' %}"><i class="fa fa-globe me-1"></i>About</a>
+        <a class="nav-link p-0 text-light {% if request.resolver_match.url_name == 'about' %}is-active-link{% endif %}" href="{% url 'ecomapp:about' %}"><i class="fa fa-globe me-1"></i>About</a>
       </div>
 
-      <form class="d-flex" action="{% url 'ecomapp:search' %}" method="get" role="search">
+      <form class="d-flex nav-search" action="{% url 'ecomapp:search' %}" method="get" role="search">
         <input class="form-control me-2" type="search" placeholder="Search cuisines" aria-label="Search" name="search" required>
-        <button class="btn btn-outline-success nav-search-btn" type="submit">Search</button>
+        <button class="btn btn-outline-success nav-search-btn" type="submit"><i class="fa fa-search me-1"></i>Search</button>
       </form>
     </div>
   </div>
