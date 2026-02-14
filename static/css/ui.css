@@ -226,6 +226,41 @@ section {
   margin-top: 1.5rem;
 }
 
+.hero_cta-row {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.hero_cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.7rem 1.4rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero_cta-btn:hover {
+  transform: translateY(-2px);
+}
+
+.hero_cta-primary {
+  color: #ffffff;
+  background: linear-gradient(130deg, var(--ui-primary), var(--ui-primary-dark));
+  box-shadow: 0 14px 24px rgba(255, 123, 57, 0.26);
+}
+
+.hero_cta-secondary {
+  color: #1f2937;
+  background: #ffffff;
+  border: 1px solid var(--ui-border);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.1);
+}
+
 .hero_highlight {
   background: #ffffff;
   border-radius: 999px;
