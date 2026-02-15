@@ -18,6 +18,34 @@ body {
   background: var(--ui-surface-soft);
 }
 
+
+.top-banner {
+  background: linear-gradient(90deg, #f97316, #fb923c);
+  color: #fff;
+  position: relative;
+  z-index: 1031;
+}
+
+.top-banner_text {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.top-banner_cta {
+  display: inline-flex;
+  align-items: center;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+  transition: opacity 0.2s ease;
+}
+
+.top-banner_cta:hover {
+  opacity: 0.85;
+  color: #fff;
+}
+
 body .hero_area {
   color: #0f172a;
 }
