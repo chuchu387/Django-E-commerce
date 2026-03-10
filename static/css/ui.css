@@ -363,6 +363,47 @@ section {
   font-weight: 500;
 }
 
+
+.hero_offer-banner {
+  margin-top: 1.25rem;
+  background: linear-gradient(120deg, #1d4ed8, #2563eb);
+  color: #ffffff;
+  border-radius: 20px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 16px 30px rgba(37, 99, 235, 0.35);
+}
+
+.hero_offer-title {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.hero_offer-text {
+  font-size: 0.92rem;
+  opacity: 0.95;
+}
+
+.hero_offer-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #1d4ed8;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0.55rem 1.1rem;
+  white-space: nowrap;
+}
+
+.hero_offer-cta:hover {
+  color: #1e40af;
+}
+
 .popular_section {
   background: linear-gradient(180deg, rgba(248, 250, 252, 0.9), #ffffff);
 }
@@ -509,6 +550,11 @@ section {
   }
 
   .main-navbar .nav-link {
+    align-items: flex-start;
+  }
+
+  .hero_offer-banner {
+    flex-direction: column;
     align-items: flex-start;
   }
 }
