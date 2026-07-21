@@ -371,10 +371,8 @@ class AddToCartView(EcomMixin, View):
                 )
             Cart.objects.filter(id=cart_obj.id).update(total=F("total") + price)
 
-        # Recalculate cart item count for AJAX response
-        from django.db.models import Sum
         qs = CartProduct.objects.filter(cart=cart_obj)
-        cart_count = qs.aggregate(total_qty=Sum("quantity"))["total_qty"] or 0
+        cart_count = qs.count()
 
         msg = f"{product_obj.title} added to your cart."
         if is_ajax:
@@ -455,7 +453,7 @@ class ManageCartView(EcomMixin, View):
 
         if is_ajax:
             cart_obj.refresh_from_db()
-            cart_count = CartProduct.objects.filter(cart=cart_obj).aggregate(s=Sum("quantity"))["s"] or 0
+            cart_count = CartProduct.objects.filter(cart=cart_obj).count()
             data = {"message": "Cart updated"}
             if removed:
                 remaining = CartProduct.objects.filter(cart=cart_obj).exists()

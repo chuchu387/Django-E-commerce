@@ -1,5 +1,3 @@
-from django.db.models import Sum
-
 from .models import Cart, CartProduct
 
 
@@ -8,10 +6,7 @@ def cart_summary(request):
     if not cart_id:
         return {"cart_item_count": 0, "cart_preview": None}
 
-    item_count = (
-        CartProduct.objects.filter(cart_id=cart_id).aggregate(total=Sum("quantity"))["total"]
-        or 0
-    )
+    item_count = CartProduct.objects.filter(cart_id=cart_id).count()
     try:
         cart = Cart.objects.prefetch_related("cartproduct_set__product").get(id=cart_id)
     except Cart.DoesNotExist:
