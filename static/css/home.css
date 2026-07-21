@@ -857,3 +857,105 @@ a {
     display: none;
   }
 }
+
+/* Homepage polish layer */
+.header_section a,
+.custom_menu-btn button,
+.hero_cta-btn,
+.hero_search-btn,
+.hero_filter-link,
+.product_card,
+.service_card,
+.steps_card,
+.hero_mini-card,
+.hero_offer-cta {
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease,
+    opacity 160ms ease;
+}
+
+.header_section a:focus-visible,
+.custom_menu-btn button:focus-visible,
+.hero_cta-btn:focus-visible,
+.hero_search-btn:focus-visible,
+.hero_filter-link:focus-visible,
+.hero_offer-cta:focus-visible {
+  outline: 3px solid rgba(242, 103, 34, 0.34);
+  outline-offset: 3px;
+}
+
+.home_nav-links a:hover,
+.home_nav-links a:focus,
+.User_option a:hover,
+.User_option a:focus {
+  color: #b84412;
+  background: #fff4ec;
+  border-color: rgba(242, 103, 34, 0.3);
+  box-shadow: 0 10px 22px rgba(40, 49, 33, 0.08);
+  transform: translateY(-1px);
+}
+
+.custom_menu-btn button:hover,
+.custom_menu-btn button:focus {
+  background: #fff4ec;
+  border-color: rgba(242, 103, 34, 0.38);
+  box-shadow: 0 12px 24px rgba(40, 49, 33, 0.12);
+  transform: translateY(-1px);
+}
+
+.hero_search .form-control:hover,
+.hero_search .form-control:focus,
+.slider_section .find_container form .form-control:hover,
+.slider_section .find_container form .form-control:focus {
+  border-color: rgba(242, 103, 34, 0.36);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(242, 103, 34, 0.1);
+}
+
+.hero_search-btn,
+.hero_cta-primary,
+.hero_offer-cta,
+.product_cta {
+  box-shadow: 0 12px 28px rgba(242, 103, 34, 0.22);
+}
+
+.hero_search-btn:hover,
+.hero_search-btn:focus,
+.hero_cta-primary:hover,
+.hero_cta-primary:focus,
+.hero_offer-cta:hover,
+.hero_offer-cta:focus,
+.product_cta:hover,
+.product_cta:focus {
+  box-shadow: 0 16px 34px rgba(242, 103, 34, 0.3);
+  transform: translateY(-2px);
+}
+
+.hero_cta-secondary:hover,
+.hero_cta-secondary:focus,
+.hero_filter-link:hover,
+.hero_filter-link:focus {
+  color: #b84412;
+  background: #fff4ec;
+  border-color: rgba(242, 103, 34, 0.36);
+  box-shadow: 0 10px 22px rgba(40, 49, 33, 0.08);
+  transform: translateY(-1px);
+}
+
+.product_card:hover,
+.service_card:hover,
+.steps_card:hover,
+.hero_mini-card:hover {
+  border-color: rgba(242, 103, 34, 0.3);
+  box-shadow: 0 20px 46px rgba(40, 49, 33, 0.12);
+  transform: translateY(-3px);
+}
+
+.overlay-content a:hover,
+.overlay-content a:focus {
+  color: #f26722;
+}

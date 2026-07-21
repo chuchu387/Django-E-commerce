@@ -1316,3 +1316,329 @@ button:disabled {
     height: 300px;
   }
 }
+
+/* System polish layer */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  color: #ffffff;
+  background: var(--sys-accent);
+}
+
+:where(a, button, .btn, input, select, textarea, .dropdown-item, .product_card, .surface-card, .category_chip) {
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease,
+    opacity 160ms ease;
+}
+
+:where(a, button, .btn, input, select, textarea):focus-visible {
+  outline: 3px solid rgba(242, 103, 34, 0.34);
+  outline-offset: 3px;
+}
+
+.btn {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.58rem 1rem;
+  border-radius: 14px;
+  font-weight: 850;
+  line-height: 1.1;
+  letter-spacing: 0;
+  box-shadow: none;
+}
+
+.btn-sm {
+  min-height: 34px;
+  padding: 0.42rem 0.74rem;
+  border-radius: 12px;
+  font-size: 0.86rem;
+}
+
+.btn-lg {
+  min-height: 52px;
+  padding: 0.8rem 1.25rem;
+  border-radius: 16px;
+}
+
+.btn-primary,
+.product_cta,
+.nav-search-btn {
+  color: #ffffff !important;
+  background: linear-gradient(180deg, #ff7b34 0%, var(--sys-accent) 100%);
+  border-color: #e85b18;
+  box-shadow: 0 10px 22px rgba(242, 103, 34, 0.2);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.product_cta:hover,
+.product_cta:focus,
+.nav-search-btn:hover,
+.nav-search-btn:focus {
+  color: #ffffff !important;
+  background: linear-gradient(180deg, #ff8a4b 0%, #e55a18 100%);
+  border-color: #d94e12;
+  box-shadow: 0 14px 28px rgba(242, 103, 34, 0.28);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active,
+.product_cta:active,
+.nav-search-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 7px 16px rgba(242, 103, 34, 0.18);
+}
+
+.btn-outline-primary,
+.btn-outline-secondary {
+  color: var(--sys-text);
+  background: #ffffff;
+  border-color: var(--sys-border);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+  color: var(--sys-text);
+  background: #fff8f3;
+  border-color: rgba(242, 103, 34, 0.46);
+  box-shadow: 0 10px 22px rgba(40, 49, 33, 0.08);
+  transform: translateY(-1px);
+}
+
+.btn-outline-danger {
+  color: #b8321d;
+  background: #fffafa;
+  border-color: #f3c6ba;
+}
+
+.btn-outline-danger:hover,
+.btn-outline-danger:focus {
+  color: #ffffff;
+  background: #c63b22;
+  border-color: #c63b22;
+  box-shadow: 0 10px 22px rgba(198, 59, 34, 0.18);
+  transform: translateY(-1px);
+}
+
+.btn-secondary,
+.btn:disabled,
+button:disabled {
+  color: #697264 !important;
+  background: #edf0e8 !important;
+  border-color: #dce2d5 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.main-navbar {
+  min-height: 76px;
+}
+
+.main-navbar .navbar-links .nav-link {
+  min-height: 40px;
+}
+
+.main-navbar .navbar-links .nav-link:hover,
+.main-navbar .navbar-links .nav-link:focus {
+  background: #fff4ec;
+  color: var(--sys-text);
+}
+
+.main-navbar .navbar-links .nav-link.is-active {
+  background: #fff8f3;
+}
+
+.main-navbar .navbar-links .nav-link.is-active::after {
+  right: 0.8rem;
+  bottom: 0.14rem;
+  left: 0.8rem;
+  height: 2px;
+}
+
+.account-menu_btn:hover,
+.account-menu_btn:focus {
+  background: #fff8f3;
+  box-shadow: 0 10px 24px rgba(40, 49, 33, 0.09);
+  transform: translateY(-1px);
+}
+
+.account-dropdown .dropdown-item:hover,
+.account-dropdown .dropdown-item:focus {
+  color: var(--sys-text);
+  background: #fff4ec;
+}
+
+.top-banner_cta {
+  text-decoration: none;
+  font-weight: 850;
+}
+
+.top-banner_cta:hover {
+  color: #ffb58d;
+}
+
+.form-control,
+.form-select,
+.filter-field input,
+.filter-field select,
+.auth-field input,
+.auth-field select,
+.auth-field textarea,
+.form-card input,
+.form-card select,
+.form-card textarea,
+.checkout-form input,
+.checkout-form select,
+.checkout-form textarea {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.form-control:hover,
+.form-select:hover,
+.filter-field input:hover,
+.filter-field select:hover,
+.auth-field input:hover,
+.auth-field select:hover,
+.auth-field textarea:hover,
+.form-card input:hover,
+.form-card select:hover,
+.form-card textarea:hover,
+.checkout-form input:hover,
+.checkout-form select:hover,
+.checkout-form textarea:hover {
+  border-color: #cbd4c4;
+  background: #ffffff;
+}
+
+.form-control:focus,
+.form-select:focus,
+.filter-field input:focus,
+.filter-field select:focus,
+.form-card input:focus,
+.form-card select:focus,
+.form-card textarea:focus,
+.checkout-form input:focus,
+.checkout-form select:focus,
+.checkout-form textarea:focus {
+  border-color: var(--sys-accent);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(242, 103, 34, 0.12);
+}
+
+.surface-card,
+.product_card,
+.stat-card,
+.feature-item,
+.empty-state,
+.cart-drawer,
+.auth-card {
+  box-shadow: 0 16px 42px rgba(40, 49, 33, 0.07);
+}
+
+.product_card:hover {
+  border-color: rgba(242, 103, 34, 0.32) !important;
+  box-shadow: 0 20px 46px rgba(40, 49, 33, 0.12);
+  transform: translateY(-3px);
+}
+
+.product_card:hover .product_title a {
+  color: #b84412;
+}
+
+.product_image-wrapper {
+  display: block;
+}
+
+.product_image-wrapper:focus-visible {
+  outline: 3px solid rgba(242, 103, 34, 0.32);
+  outline-offset: 4px;
+}
+
+.category_chip:hover,
+.category_chip:focus {
+  color: var(--sys-text);
+  background: #fff4ec;
+  border-color: rgba(242, 103, 34, 0.42);
+  box-shadow: 0 10px 22px rgba(40, 49, 33, 0.08);
+  transform: translateY(-1px);
+}
+
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table tbody tr {
+  transition: background-color 160ms ease;
+}
+
+.table tbody tr:hover {
+  background: #fffaf6;
+}
+
+.quantity-stepper button:hover,
+.quantity-stepper button:focus {
+  color: #b84412;
+  background: #fff4ec;
+}
+
+.cart-count-badge {
+  box-shadow: 0 6px 14px rgba(242, 103, 34, 0.22);
+}
+
+.cart-drawer {
+  animation: cartDrawerIn 220ms ease both;
+}
+
+@keyframes cartDrawerIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-toast {
+  animation: toastIn 180ms ease both;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
