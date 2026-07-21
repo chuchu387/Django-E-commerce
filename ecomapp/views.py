@@ -1,6 +1,7 @@
 import csv
 import json
 import requests
+from collections import OrderedDict
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
@@ -50,6 +51,28 @@ def calculate_order_commission(order):
         else:
             total_commission += config.commission_value
     return total_commission
+
+
+def group_cart_items_by_vendor(cart):
+    """Return cart lines grouped by kitchen for customer-facing summaries."""
+    if not cart:
+        return []
+    groups = OrderedDict()
+    for cp in cart.cartproduct_set.select_related("product__vendor", "product__category").all():
+        vendor = cp.product.vendor
+        key = vendor.id if vendor else "platform"
+        if key not in groups:
+            groups[key] = {
+                "vendor": vendor,
+                "name": vendor.name if vendor else "BhokLagyao",
+                "items": [],
+                "subtotal": 0,
+                "item_count": 0,
+            }
+        groups[key]["items"].append(cp)
+        groups[key]["subtotal"] += cp.subtotal
+        groups[key]["item_count"] += 1
+    return list(groups.values())
 
 
 def log_order_status(order, status, updated_by="system", note=None):
@@ -182,7 +205,7 @@ class HomeView(EcomMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         now = timezone.now()
-        all_products = Product.objects.select_related("category").prefetch_related(
+        all_products = Product.objects.select_related("category", "vendor").prefetch_related(
             "productimage_set"
         ).filter(
             is_hidden=False,
@@ -206,7 +229,7 @@ class AllProductsView(EcomMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         now = timezone.now()
-        products_qs = Product.objects.select_related("category").filter(
+        products_qs = Product.objects.select_related("category", "vendor").filter(
             is_hidden=False,
             is_available=True,
         ).filter(
@@ -226,7 +249,7 @@ class ProductsView(EcomMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         now = timezone.now()
-        products = Product.objects.select_related("category").filter(
+        products = Product.objects.select_related("category", "vendor").filter(
             is_hidden=False,
         ).filter(
             Q(available_from__isnull=True) | Q(available_from__lte=now),
@@ -267,6 +290,29 @@ class ProductsView(EcomMixin, TemplateView):
         return context
 
 
+class VendorStorefrontView(EcomMixin, TemplateView):
+    template_name = "vendor_storefront.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        vendor = get_object_or_404(Vendor, slug=self.kwargs["slug"], is_active=True)
+        now = timezone.now()
+        products = Product.objects.select_related("category", "vendor").filter(
+            vendor=vendor,
+            is_hidden=False,
+            is_available=True,
+            is_approved=True,
+        ).filter(
+            Q(available_from__isnull=True) | Q(available_from__lte=now),
+            Q(available_until__isnull=True) | Q(available_until__gte=now),
+        ).order_by("category__title", "title")
+        context["vendor"] = vendor
+        context["products"] = products
+        context["is_open"] = vendor.is_open_now()
+        context["categories"] = Category.objects.filter(product__vendor=vendor).distinct().order_by("title")
+        return context
+
+
 class ProductDetailView(EcomMixin, TemplateView):
     template_name = 'productdetail.html'
 
@@ -274,7 +320,7 @@ class ProductDetailView(EcomMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         url_slug = self.kwargs['slug']
         product = get_object_or_404(
-            Product.objects.select_related("category").prefetch_related(
+            Product.objects.select_related("category", "vendor").prefetch_related(
                 "productimage_set"
             ),
             slug=url_slug,
@@ -403,6 +449,7 @@ class MyCartView(EcomMixin, TemplateView):
             cart = None
 
         context['cart'] = cart
+        context["vendor_groups"] = group_cart_items_by_vendor(cart)
         return context
 
 
@@ -526,6 +573,7 @@ class CheckoutView(EcomMixin, CreateView):
         else:
             cart_obj = None
         context['cart'] = cart_obj
+        context["vendor_groups"] = group_cart_items_by_vendor(cart_obj)
         zone_id = self.request.POST.get("delivery_zone") if self.request.method == "POST" else None
         zone = DeliveryZone.objects.filter(id=zone_id).first() if zone_id else None
         if zone is None:

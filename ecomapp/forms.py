@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 
-from .models import Address, Coupon, Customer, DeliveryZone, Order, Product, Review, Vendor
+from .models import Address, CartProduct, Coupon, Customer, DeliveryZone, Order, Product, Review, Vendor
 
 
 class CheckoutForm(forms.ModelForm):

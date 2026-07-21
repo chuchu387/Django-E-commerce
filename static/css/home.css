@@ -694,6 +694,33 @@ a {
   font-weight: 800;
 }
 
+.app-toast-error,
+.ajax-toast-error {
+  background: #7f1d1d;
+}
+
+.app-toast-warning,
+.ajax-toast-warning {
+  color: #231f16;
+  background: #f8d878;
+}
+
+.app-toast-info,
+.ajax-toast-info {
+  background: #1e3a5f;
+}
+
+@keyframes toastSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
 .steps_section {
   background: #ffffff;
 }

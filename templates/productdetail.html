@@ -37,7 +37,7 @@
       <p class="product_meta mb-2">
         {{ product.category }}
         {% if product.vendor %}
-          <span class="ms-2">| {{ product.vendor.name }}</span>
+          <span class="ms-2">| <a class="vendor-mini-link" href="{% url 'ecomapp:vendorstorefront' product.vendor.slug %}">{{ product.vendor.name }}</a></span>
         {% endif %}
       </p>
       <h2 class="h3 fw-bold">{{ product.title }}</h2>

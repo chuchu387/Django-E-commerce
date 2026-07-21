@@ -174,7 +174,8 @@
   // AJAX form submission handler — no page refresh
   document.addEventListener('submit', function(e) {
     var form = e.target;
-    if (!form.hasAttribute('data-ajax')) return;
+    var ajaxMode = form.getAttribute('data-ajax');
+    if (ajaxMode !== '1' && ajaxMode !== 'true') return;
     e.preventDefault();
 
     var btn = form.querySelector('button[type="submit"]');
@@ -246,7 +247,7 @@
       var region = document.querySelector('.toast-region');
       if (!region) { region = document.createElement('div'); region.className = 'toast-region'; document.body.appendChild(region); }
       var t = document.createElement('div');
-      t.className = 'ajax-toast ajax-toast-' + (type || 'success');
+      t.className = 'app-toast ajax-toast app-toast-' + (type || 'success') + ' ajax-toast-' + (type || 'success');
       t.innerHTML = '<span class="toast-body">' + escapeHtml(msg) + '</span><button class="toast-close" onclick="this.parentElement.remove()">&times;</button>';
       region.appendChild(t);
       var timeout = setTimeout(function() { closeToast(t); }, 2000);

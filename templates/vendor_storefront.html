@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}{{ vendor.name }} | BhokLagyao{% endblock %}
+{% block meta_description %}Browse dishes from {{ vendor.name }} on BhokLagyao.{% endblock %}
+{% block og_title %}{{ vendor.name }}{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+  <header class="page-hero vendor-storefront-hero">
+    <div>
+      <span class="page-kicker">Kitchen</span>
+      <h1 class="page-title mb-0">{{ vendor.name }}</h1>
+      <p class="page-lede">
+        {% if vendor.description %}
+          {{ vendor.description }}
+        {% else %}
+          Freshly prepared dishes from this BhokLagyao kitchen.
+        {% endif %}
+      </p>
+      <div class="vendor-storefront-meta">
+        <span>{% if is_open and not vendor.is_on_vacation %}Open now{% else %}Currently unavailable{% endif %}</span>
+        {% if vendor.address %}<span>{{ vendor.address }}</span>{% endif %}
+        {% if vendor.contact_phone %}<span>{{ vendor.contact_phone }}</span>{% endif %}
+      </div>
+    </div>
+    <div class="vendor-storefront-badge">
+      {% if vendor.logo %}
+        <img src="{{ vendor.logo.url }}" alt="{{ vendor.name }}">
+      {% else %}
+        <span>{{ vendor.name|first|upper }}</span>
+      {% endif %}
+    </div>
+  </header>
+
+  {% if categories %}
+    <nav class="category_nav mb-4" aria-label="Kitchen categories">
+      {% for category in categories %}
+        <a class="category_chip" href="{% url 'ecomapp:products' %}?vendor={{ vendor.slug }}&category={{ category.slug }}">{{ category.title }}</a>
+      {% endfor %}
+    </nav>
+  {% endif %}
+
+  <div class="compact-product-grid">
+    {% for p in products %}
+      <article class="product_card compact-product-card">
+        <a class="product_image-wrapper" href="{% url 'ecomapp:productdetail' p.slug %}">
+          <img src="{{ p.image.url }}" alt="{{ p.title }}">
+        </a>
+        <div class="product_card-body">
+          <p class="product_meta mb-1">{{ p.category.title }}</p>
+          <h2 class="product_title h6 mb-2">
+            <a class="text-decoration-none" href="{% url 'ecomapp:productdetail' p.slug %}">{{ p.title }}</a>
+          </h2>
+          <p class="product_desc mb-3">{{ p.description|truncatechars:80 }}</p>
+          <p class="product_price mb-3 mt-auto">
+            <small class="text-muted text-decoration-line-through me-2">Rs. {{ p.marked_price }}</small>
+            <strong>Rs. {{ p.selling_price }}</strong>
+          </p>
+          {% if p.is_available_for_purchase %}
+            <form action="{% url 'ecomapp:addtocart' p.id %}" method="post" class="add-to-cart-form" data-ajax="1">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary product_cta w-100" data-loading-text="Adding...">Add</button>
+            </form>
+          {% else %}
+            <button class="btn btn-secondary w-100" disabled>Unavailable</button>
+          {% endif %}
+        </div>
+      </article>
+    {% empty %}
+      <div class="empty-state">
+        <h2>No dishes available</h2>
+        <p>This kitchen has not published any available dishes yet.</p>
+        <a class="btn btn-primary" href="{% url 'ecomapp:products' %}">Browse all products</a>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -21,6 +21,26 @@
   <div class="checkout-layout">
     <section class="surface-card">
       <h2 class="h5 fw-bold mb-3">Order Summary</h2>
+      {% if vendor_groups %}
+        <div class="vendor-cart-groups checkout-vendor-groups">
+          {% for group in vendor_groups %}
+            <section class="vendor-cart-group">
+              <div>
+                <span class="vendor-group-kicker">Kitchen</span>
+                <h3>
+                  {% if group.vendor %}
+                    <a href="{% url 'ecomapp:vendorstorefront' group.vendor.slug %}">{{ group.name }}</a>
+                  {% else %}
+                    {{ group.name }}
+                  {% endif %}
+                </h3>
+                <p>{{ group.item_count }} product{{ group.item_count|pluralize }} prepared by this kitchen.</p>
+              </div>
+              <strong>Rs. {{ group.subtotal }}</strong>
+            </section>
+          {% endfor %}
+        </div>
+      {% endif %}
       <div class="table-responsive">
         <table class="table align-middle mb-0">
           <thead>

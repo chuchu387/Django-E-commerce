@@ -39,6 +39,9 @@
               </a>
               <div class="product_card-body">
                 <p class="product_meta mb-1">{{ p.category.title }}</p>
+                {% if p.vendor %}
+                  <a class="vendor-mini-link" href="{% url 'ecomapp:vendorstorefront' p.vendor.slug %}">{{ p.vendor.name }}</a>
+                {% endif %}
                 <h3 class="product_title h5 mb-2">
                   <a class="text-decoration-none" href="{% url 'ecomapp:productdetail' p.slug %}">{{ p.title }}</a>
                 </h3>
