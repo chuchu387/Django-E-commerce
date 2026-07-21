@@ -1,0 +1,36 @@
+{% extends 'vendor_base.html' %}
+{% block title %}New Coupon{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-icon">🏷️</div>
+    <h1 class="auth-title">New Coupon</h1>
+    <p class="auth-subtitle">Create a discount code — it will be sent for admin approval.</p>
+    <form action="" method="post">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        {% for e in form.non_field_errors %}
+          <div class="form-error" style="margin-bottom:0.75rem">{{ e }}</div>
+        {% endfor %}
+      {% endif %}
+      {% for field in form %}
+        <div class="auth-field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <div class="form-help">{{ field.help_text }}</div>
+          {% endif %}
+          {% for error in field.errors %}
+            <div class="form-error">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+      <button class="btn btn-primary w-100 auth-btn">Create Coupon</button>
+    </form>
+    <div class="auth-footer">
+      <a href="{% url 'ecomapp:vendorcoupons' %}">&larr; Back to coupons</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

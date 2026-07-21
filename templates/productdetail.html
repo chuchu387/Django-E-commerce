@@ -1,46 +1,219 @@
 {% extends 'base.html' %}
 {% block title %}{{ product.title }}{% endblock %}
+{% block meta_description %}Order {{ product.title }} from BhokLagyao for Rs. {{ product.selling_price }}. {{ product.description|truncatechars:110 }}{% endblock %}
+{% block og_title %}{{ product.title }} | BhokLagyao{% endblock %}
+{% block og_description %}{{ product.description|truncatechars:150 }}{% endblock %}
+{% block og_type %}product{% endblock %}
+{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{{ product.image.url }}{% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="mb-4">
-    <h1 class="page-title mb-1">{{ product.title }}</h1>
-    <p class="text-muted mb-0">Category: {{ product.category }} • Viewed {{ product.view_count }} times</p>
-  </div>
+<div class="page-shell">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">{{ product.category }}</span>
+      <h1 class="page-title mb-0">{{ product.title }}</h1>
+      <p class="page-lede">Viewed {{ product.view_count }} times. Freshly prepared and ready for your cart.</p>
+    </div>
+    <a href="{% url 'ecomapp:products' %}" class="btn btn-outline-primary">Back to Products</a>
+  </header>
 
-  <div class="row g-4">
-    <div class="col-lg-5">
-      <div class="card border-0 p-3">
-        <img src="{{ product.image.url }}" alt="{{ product.title }}" class="img-fluid rounded-4 product-detail-image">
-        {% if product.productimage_set.all %}
-          <div class="row g-2 mt-3">
-            {% for pi in product.productimage_set.all %}
-              <div class="col-4">
-                <a href="{{ pi.image.url }}" target="_blank" rel="noopener noreferrer">
-                  <img src="{{ pi.image.url }}" class="img-fluid rounded-3 product-thumb" alt="{{ product.title }} preview">
-                </a>
-              </div>
-            {% endfor %}
-          </div>
-        {% endif %}
-      </div>
+  <div class="detail-layout">
+    <div class="surface-card">
+      <img src="{{ product.image.url }}" alt="{{ product.title }}" class="product-detail-image">
+      {% if product.productimage_set.all %}
+        <div class="row g-3 mt-2">
+          {% for pi in product.productimage_set.all %}
+            <div class="col-4">
+              <a href="{{ pi.image.url }}" target="_blank" rel="noopener noreferrer">
+                <img src="{{ pi.image.url }}" class="img-fluid rounded-4 product-thumb" alt="{{ product.title }} preview">
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
     </div>
 
-    <div class="col-lg-7">
-      <div class="card border-0 p-4 h-100">
-        <h2 class="h4">{{ product.title }}</h2>
-        <p class="product_price mb-3">
-          <small class="text-muted text-decoration-line-through me-2">Rs. {{ product.marked_price }}</small>
-          <strong>Rs. {{ product.selling_price }}</strong>
-        </p>
-        <p class="mb-4">{{ product.description }}</p>
-        <p class="mb-4"><span class="fw-semibold">Return Policy:</span> {{ product.return_policy }}</p>
-        <div class="mt-auto d-flex gap-2 flex-wrap">
-          <a href="{% url 'ecomapp:addtocart' product.id %}" class="btn btn-primary">Add to Cart</a>
-          <a href="{% url 'ecomapp:allproducts' %}" class="btn btn-outline-primary">Continue Shopping</a>
+    <aside class="surface-card">
+      <p class="product_meta mb-2">
+        {{ product.category }}
+        {% if product.vendor %}
+          <span class="ms-2">| {{ product.vendor.name }}</span>
+        {% endif %}
+      </p>
+      <h2 class="h3 fw-bold">{{ product.title }}</h2>
+      {% if avg_rating %}
+      <p class="mb-2">
+        {% for i in "12345"|make_list %}
+          {% if forloop.counter <= avg_rating %}★{% else %}☆{% endif %}
+        {% endfor %}
+        <span class="text-muted small ms-1">{{ avg_rating }} ({{ review_count }} review{{ review_count|pluralize }})</span>
+      </p>
+      {% endif %}
+      <p class="product_price my-3">
+        <small class="text-muted text-decoration-line-through me-2">Rs. {{ product.marked_price }}</small>
+        <strong>Rs. {{ product.selling_price }}</strong>
+        {% if product.stock > 0 and product.stock <= 5 %}
+          <span class="badge bg-warning ms-2">Only {{ product.stock }} left</span>
+        {% elif not product.is_available or product.stock == 0 %}
+          <span class="badge bg-danger ms-2">Sold Out</span>
+        {% elif product.available_from and product.available_from > now %}
+          <span class="badge bg-warning ms-2">Available from {{ product.available_from|date:"M d, H:i" }}</span>
+        {% elif product.available_until and product.available_until < now %}
+          <span class="badge bg-secondary ms-2">No Longer Available</span>
+        {% endif %}
+      </p>
+      <p class="product_desc">{{ product.description }}</p>
+      <div class="product-detail_specs">
+        <div>
+          <span>Delivery</span>
+          <strong>25-35 min</strong>
+        </div>
+        <div>
+          <span>Portion</span>
+          <strong>Serves 1</strong>
+        </div>
+        <div>
+          <span>Quality</span>
+          <strong>Prepared fresh</strong>
         </div>
       </div>
-    </div>
+      <div class="detail-info-grid">
+        <section>
+          <h3>Good to know</h3>
+          <ul>
+            <li>Prepared after order confirmation.</li>
+            <li>Best enjoyed warm on delivery.</li>
+            <li>Contact support for allergy questions before ordering.</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Pairs well with</h3>
+          <ul>
+            <li>Cold beverage</li>
+            <li>Fresh side salad</li>
+            <li>House sauce</li>
+          </ul>
+        </section>
+      </div>
+      <div class="surface-card shadow-none p-3 my-4">
+        <strong>Return Policy</strong>
+        <p class="mb-0 mt-1 text-muted">{{ product.return_policy|default:"Please contact support for return or replacement questions." }}</p>
+      </div>
+      <div class="d-grid gap-2">
+        {% if product.is_available_for_purchase %}
+          <form action="{% url 'ecomapp:addtocart' product.id %}" method="post" data-ajax="1">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary w-100" data-loading-text="Adding...">Add to Cart</button>
+          </form>
+        {% else %}
+          <button class="btn btn-secondary w-100" disabled>{% if not product.is_available %}Sold Out{% else %}Currently Unavailable{% endif %}</button>
+        {% endif %}
+        <div class="d-flex gap-2">
+          <a href="{% url 'ecomapp:mycart' %}" class="btn btn-outline-primary flex-grow-1">View Cart</a>
+          {% if request.user.customer %}
+          <form action="{% url 'ecomapp:togglefavorite' product.id %}" method="post" class="d-inline" data-ajax="1">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger" data-loading-text="...">{% if request.user.customer and product.id in user_fav_ids %}♥{% else %}♡{% endif %}</button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+    </aside>
   </div>
+
+  <section class="reviews-section surface-card my-4">
+    <div class="reviews-header">
+      <div>
+        <h2 class="h5 fw-bold mb-1">Customer Reviews</h2>
+        {% if avg_rating %}
+        <div class="reviews-summary">
+          <span class="stars-display">
+            {% for i in "12345"|make_list %}
+              <span class="star {% if forloop.counter <= avg_rating %}filled{% endif %}">★</span>
+            {% endfor %}
+          </span>
+          <span class="reviews-count">{{ avg_rating }} out of 5 · {{ review_count }} review{{ review_count|pluralize }}</span>
+        </div>
+        {% endif %}
+      </div>
+      {% if not user_review and request.user.customer %}
+      <button class="btn btn-outline-primary btn-sm" onclick="document.getElementById('review-form').classList.toggle('d-none')">Write a Review</button>
+      {% endif %}
+    </div>
+
+    {% if request.user.customer %}
+    <form id="review-form" action="{% url 'ecomapp:submitreview' product.slug %}" method="post" class="review-form {% if user_review %}{% else %}d-none{% endif %}">
+      {% csrf_token %}
+      <div class="star-rating">
+        <input type="radio" name="rating" value="5" id="star5" {% if user_review and user_review.rating == 5 %}checked{% endif %}><label for="star5" title="5 stars">★</label>
+        <input type="radio" name="rating" value="4" id="star4" {% if user_review and user_review.rating == 4 %}checked{% endif %}><label for="star4" title="4 stars">★</label>
+        <input type="radio" name="rating" value="3" id="star3" {% if user_review and user_review.rating == 3 %}checked{% endif %}><label for="star3" title="3 stars">★</label>
+        <input type="radio" name="rating" value="2" id="star2" {% if user_review and user_review.rating == 2 %}checked{% endif %}><label for="star2" title="2 stars">★</label>
+        <input type="radio" name="rating" value="1" id="star1" {% if user_review and user_review.rating == 1 %}checked{% endif %}><label for="star1" title="1 star">★</label>
+      </div>
+      <textarea name="text" class="form-control" rows="3" placeholder="Share what you thought of this dish...">{{ user_review.text|default:"" }}</textarea>
+      <div class="review-form-actions">
+        <button type="submit" class="btn btn-primary">{% if user_review %}Update Review{% else %}Submit Review{% endif %}</button>
+        {% if user_review %}
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="document.getElementById('review-form').classList.toggle('d-none')">Cancel</button>
+        {% endif %}
+      </div>
+    </form>
+    {% endif %}
+
+    <div class="reviews-list">
+      {% for review in reviews %}
+      <div class="review-card">
+        <div class="review-avatar">{{ review.customer.full_name|first|upper }}</div>
+        <div class="review-body">
+          <div class="review-meta">
+            <strong class="review-author">{{ review.customer.full_name }}</strong>
+            <span class="stars-display small">
+              {% for i in "12345"|make_list %}
+                <span class="star {% if forloop.counter <= review.rating %}filled{% endif %}">★</span>
+              {% endfor %}
+            </span>
+            <span class="review-date">{{ review.created_at|timesince }} ago</span>
+          </div>
+          {% if review.text %}
+          <p class="review-text">{{ review.text }}</p>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div class="text-center py-5">
+        <p class="text-muted mb-2">No reviews yet. Be the first to share your experience!</p>
+        {% if request.user.customer and not user_review %}
+        <button class="btn btn-outline-primary btn-sm" onclick="document.getElementById('review-form').classList.remove('d-none')">Write a Review</button>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if related_products %}
+    <section class="category-section">
+      <div class="section-head">
+        <h2>You may also like</h2>
+        <a href="{% url 'ecomapp:products' %}?category={{ product.category.slug }}" class="category_chip">View category</a>
+      </div>
+      <div class="compact-product-grid">
+        {% for p in related_products %}
+          <article class="product_card compact-product-card">
+            <a class="product_image-wrapper" href="{% url 'ecomapp:productdetail' p.slug %}">
+              <img src="{{ p.image.url }}" alt="{{ p.title }}">
+            </a>
+            <div class="product_card-body">
+              <p class="product_meta mb-1">{{ p.category.title }}</p>
+              <h3 class="product_title h6 mb-2">
+                <a class="text-decoration-none" href="{% url 'ecomapp:productdetail' p.slug %}">{{ p.title }}</a>
+              </h3>
+              <p class="product_price mb-3 mt-auto"><strong>Rs. {{ p.selling_price }}</strong></p>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
 </div>
 {% endblock %}

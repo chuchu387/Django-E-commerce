@@ -1,46 +1,105 @@
 {% extends 'base.html' %}
-{% load humanize%}
-{% block title %} Order Details {% endblock %}
+{% load humanize %}
+{% block title %}Order #{{ ord_obj.id }}{% endblock %}
+
 {% block content %}
-
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 mx-auto">
-            <h3>Order Details</h3>
-            <p><span class="font-weight-bold">Order ID: </span>ORDER_{{ ord_obj.id }}</p>
-            <p><span class="font-weight-bold">Order Status: </span>{{ ord_obj.order_status }}</p>
-            <p><span class="font-weight-bold">Order Status: </span>{{ ord_obj.created_at }}</p>
-            <p><span class="font-weight-bold">Customer Information: </span> By {{ ord_obj.ordered_by }}, {{ ord_obj.mobile }}</p>
-            <p><span class="font-weight-bold">Shipping Address: </span> By {{ ord_obj.shipping_address }} ({{ ord_obj.email }})</p>
-            <h4>Ordered Items</h4>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>SN</th>
-                        <th>Item</th>
-                        <th>Rate</th>
-                        <th>Quantity</th>
-                        <th>Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for cp in ord_obj.cart.cartproduct_set.all %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td><a target="_blank" href="{% url 'ecomapp:productdetail' cp.product.slug %}">{{cp.product.title}} ({{cp.product.id}})</a> </td>
-                        <td>{{cp.rate}}</td>
-                        <td>{{cp.quantity}}</td>
-                        <td>{{cp.subtotal}}</td>
-                    </tr>
-                    {% endfor %}
-                    <tr>
-                        <th colspan="4" class="text-right">Total: </th>
-                        <th>Rs {{ ord_obj.total|intcomma }}/-</th>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+<div class="page-shell">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Order #{{ ord_obj.id }}</span>
+      <h1 class="page-title mb-0">
+        <span class="badge fs-5
+          {% if ord_obj.order_status == 'Order Completed' %}bg-success
+          {% elif ord_obj.order_status == 'Order Cancelled' %}bg-danger
+          {% elif ord_obj.order_status == 'Order Received' %}bg-warning text-dark
+          {% else %}bg-info{% endif %}">
+          {{ ord_obj.order_status }}
+        </span>
+      </h1>
+      <p class="page-lede">Placed {{ ord_obj.created_at|date:"M d, Y H:i" }} by {{ ord_obj.ordered_by }}</p>
     </div>
-</div>
+    <a class="btn btn-outline-primary" href="{% url 'ecomapp:customerprofile' %}">Back to Profile</a>
+  </header>
 
+  <div class="checkout-layout">
+    <section class="surface-card">
+      <h2 class="h5 fw-bold mb-3">Ordered Items</h2>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Kitchen</th>
+              <th>Status</th>
+              <th>Rate</th>
+              <th>Qty</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cp in ord_obj.cart.cartproduct_set.all %}
+              <tr>
+                <td><a class="fw-bold" target="_blank" href="{% url 'ecomapp:productdetail' cp.product.slug %}">{{ cp.product.title }}</a></td>
+                <td><small class="text-muted">{{ cp.product.vendor.name|default:"—" }}</small></td>
+                <td>
+                  <span class="badge
+                    {% if cp.vendor_status == 'Order Completed' %}bg-success
+                    {% elif cp.vendor_status == 'Order Processing' %}bg-info
+                    {% elif cp.vendor_status == 'Order Cancelled' %}bg-danger
+                    {% elif cp.vendor_status == 'On the way' %}bg-primary
+                    {% else %}bg-warning text-dark{% endif %}">
+                    {{ cp.vendor_status }}
+                  </span>
+                </td>
+                <td>Rs. {{ cp.rate }}</td>
+                <td>{{ cp.quantity }}</td>
+                <td>Rs. {{ cp.subtotal }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <aside class="surface-card">
+      <h2 class="h5 fw-bold mb-3">Order Summary</h2>
+      <dl class="detail-list">
+        <div><dt>Subtotal</dt><dd>Rs. {{ ord_obj.subtotal }}</dd></div>
+        {% if ord_obj.delivery_fee %}
+        <div><dt>Delivery fee</dt><dd>Rs. {{ ord_obj.delivery_fee }}</dd></div>
+        {% endif %}
+        {% if ord_obj.discount %}
+        <div><dt>Discount</dt><dd class="text-danger">- Rs. {{ ord_obj.discount }}{% if ord_obj.coupon %} ({{ ord_obj.coupon.code }}){% endif %}</dd></div>
+        {% endif %}
+        <div><dt class="fw-bold">Total</dt><dd class="fw-bold" style="color:var(--theme-accent);">Rs. {{ ord_obj.total|intcomma }}</dd></div>
+      </dl>
+      <hr>
+      <h2 class="h5 fw-bold mb-3">Delivery Details</h2>
+      <dl class="detail-list">
+        <div><dt>Name</dt><dd>{{ ord_obj.ordered_by }}</dd></div>
+        <div><dt>Mobile</dt><dd>{{ ord_obj.mobile }}</dd></div>
+        <div><dt>Address</dt><dd>{{ ord_obj.shipping_address }}</dd></div>
+        <div><dt>Payment</dt><dd>{{ ord_obj.payment_method }}{% if ord_obj.payment_completed %} <span class="badge bg-success">Paid</span>{% endif %}</dd></div>
+        <div><dt>Delivery zone</dt><dd>{{ ord_obj.delivery_zone|default:"Standard" }}</dd></div>
+      </dl>
+      {% if ord_obj.cancellation_requested %}
+      <hr>
+      <div class="text-danger">
+        <strong>Cancellation requested</strong>
+        {% if ord_obj.refund_status == "processed" %}
+        <p class="mb-0 small">Refunded Rs. {{ ord_obj.refund_amount }}</p>
+        {% elif ord_obj.refund_status == "pending" %}
+        <p class="mb-0 small">Refund pending</p>
+        {% endif %}
+      </div>
+      {% endif %}
+      <div class="mt-3 d-grid gap-2">
+        <a href="{% url 'ecomapp:trackorder' ord_obj.id %}" class="btn btn-outline-primary btn-sm">📦 Track Order</a>
+        {% if ord_obj.order_status != "Order Completed" and ord_obj.order_status != "Order Cancelled" %}
+        <a href="{% url 'ecomapp:requestcancellation' ord_obj.id %}" class="btn btn-outline-danger btn-sm">Request Cancellation</a>
+        {% endif %}
+      </div>
+    </aside>
+  </div>
+</div>
 {% endblock %}

@@ -1,6 +1,60 @@
 {% extends 'base.html' %}
-{% block title %}About Us{% endblock %}
-{% block content%}
-    <h1>About Page</h1>
-    <p>this is about page</p>
+{% block title %}About BhokLagyao{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">About us</span>
+      <h1 class="page-title mb-0">Food ordering built for busy local customers.</h1>
+      <p class="page-lede">BhokLagyao connects customers with curated local meals, clear pricing, and a simple order flow designed for fast daily use.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'ecomapp:products' %}">Browse Menu</a>
+  </header>
+
+  <div class="about-grid">
+    <section class="surface-card">
+      <h2 class="h4 fw-bold mb-3">What we focus on</h2>
+      <p class="text-muted">Our storefront is designed around quick discovery, dependable checkout, and better visibility into the meals customers actually want to order again.</p>
+      <div class="stat-grid mt-4">
+        <div class="stat-card">
+          <span>Average ETA</span>
+          <strong>30 min</strong>
+        </div>
+        <div class="stat-card">
+          <span>Rating goal</span>
+          <strong>4.8/5</strong>
+        </div>
+        <div class="stat-card">
+          <span>Menu style</span>
+          <strong>Curated</strong>
+        </div>
+      </div>
+    </section>
+
+    <aside class="feature-list">
+      <div class="feature-item">
+        <span class="feature-icon"><i class="fa fa-cutlery"></i></span>
+        <div>
+          <h3 class="h6 fw-bold mb-1">Curated dishes</h3>
+          <p class="mb-0 text-muted">Organized categories make meals easier to scan and compare.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon"><i class="fa fa-shield"></i></span>
+        <div>
+          <h3 class="h6 fw-bold mb-1">Reliable checkout</h3>
+          <p class="mb-0 text-muted">Cart, shipping, and payment steps are kept direct and predictable.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon"><i class="fa fa-clock-o"></i></span>
+        <div>
+          <h3 class="h6 fw-bold mb-1">Fast ordering</h3>
+          <p class="mb-0 text-muted">Returning customers can move from product to checkout quickly.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
 {% endblock %}

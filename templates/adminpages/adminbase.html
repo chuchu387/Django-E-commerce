@@ -4,17 +4,74 @@
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        .admin-nav { background: #1a1a2e; padding: 0.75rem 1rem; }
+        .admin-nav a { color: #a0a0c0; text-decoration: none; margin-right: 1.25rem; font-size: 0.9rem; }
+        .admin-nav a:hover, .admin-nav a:focus { color: #fff; }
+        .badge-pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .notif-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ffc107; margin-left: 4px; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <a href="{% url 'ecomapp:adminhome' %}">Home</a> |
-        <a href="{% url 'ecomapp:adminorderlist' %}">All Orders</a> |
-        <a href="{% url 'ecomapp:adminproductlist' %}">All Products</a> |
-
-        <a href="{% url 'ecomapp:home' %}" target="_blank">Visit Site</a>
+    <div class="admin-nav">
+        <a href="{% url 'ecomapp:adminhome' %}">Dashboard</a>
+        <a href="{% url 'ecomapp:adminorderlist' %}">All Orders</a>
+        <a href="{% url 'ecomapp:adminproductlist' %}">All Products</a>
+        <a href="{% url 'ecomapp:adminproductcreate' %}">Add Product</a>
+        <a href="{% url 'ecomapp:adminpayouts' %}">Payouts</a>
+        <a href="/admin/" target="_blank">Django Admin</a>
+        <span style="color: #555;">|</span>
+        <a href="{% url 'ecomapp:home' %}" target="_blank" style="color: #6c63ff;">Visit Site</a>
+        <span id="pending-badge" style="display:none;" class="badge bg-warning badge-pulse ms-2">New!</span>
+    </div>
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
     </div>
     {% block content %}
 
     {% endblock %}
+
+<script>
+(function() {
+    var lastCount = {{ pending_count|default:0 }};
+    var badge = document.getElementById('pending-badge');
+    var audioCtx = null;
+    function playAlert() {
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            var osc = audioCtx.createOscillator();
+            var gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 800;
+            gain.gain.value = 0.15;
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        } catch(e) {}
+    }
+    setInterval(function() {
+        fetch('/admin-home/')
+            .then(function(r) { return r.text(); })
+            .then(function(html) {
+                var match = html.match(/pending_count[:\s]+(\d+)/);
+                if (match) {
+                    var newCount = parseInt(match[1], 10);
+                    if (newCount > lastCount && newCount > 0 && lastCount >= 0) {
+                        playAlert();
+                        if (badge) badge.style.display = 'inline-block';
+                        setTimeout(function() { if (badge) badge.style.display = 'none'; }, 5000);
+                    }
+                    lastCount = newCount;
+                }
+            })
+            .catch(function() {});
+    }, 30000);
+})();
+</script>
 </body>
 </html>

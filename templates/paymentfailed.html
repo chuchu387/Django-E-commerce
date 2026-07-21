@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Payment Failed{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+  <section class="page-hero">
+    <div>
+      <span class="page-kicker">Payment issue</span>
+      <h1 class="page-title mb-0">We could not verify the payment</h1>
+      <p class="page-lede">Your order ORDER_{{ order.id }} was created, but the payment did not complete. You can retry payment or contact support.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-primary" href="{% url 'ecomapp:khaltirequest' %}?o_id={{ order.id }}">Retry Khalti</a>
+      <a class="btn btn-outline-primary" href="{% url 'ecomapp:trackorder' order.id %}">Track Order</a>
+    </div>
+  </section>
+</div>
+{% endblock %}

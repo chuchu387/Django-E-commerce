@@ -1,0 +1,198 @@
+{% extends 'vendor_base.html' %}
+{% block title %}Order {{ order.id }}{% endblock %}
+
+{% block extra_head %}
+<style>
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: absolute; left: 0; top: 0; width: 100%; }
+  .no-print { display: none !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-shell-narrow">
+  <header class="page-hero no-print">
+    <div>
+      <span class="page-kicker">Kitchen Portal</span>
+      <h1 class="page-title mb-0">Order #{{ order.id }}</h1>
+    </div>
+  </header>
+
+  <div class="print-area">
+    <!-- Customer Details -->
+    <div class="surface-card p-4 mb-3">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <h2 class="h5 fw-bold mb-0">Customer Details</h2>
+        <span class="badge fs-6
+          {% if order.order_status == 'Order Completed' %}bg-success
+          {% elif order.order_status == 'Order Cancelled' %}bg-danger
+          {% elif order.order_status == 'Order Received' %}bg-warning text-dark
+          {% elif order.order_status == 'On the way' %}bg-info
+          {% else %}bg-secondary{% endif %}">
+          {{ order.order_status }}
+        </span>
+      </div>
+      <dl class="detail-list">
+        <div><dt>Name</dt><dd>{{ order.ordered_by }}</dd></div>
+        <div><dt>Mobile</dt><dd>{{ order.mobile }}</dd></div>
+        <div><dt>Address</dt><dd>{{ order.shipping_address }}</dd></div>
+        <div><dt>Email</dt><dd>{{ order.email|default:"—" }}</dd></div>
+        <div><dt>Payment</dt><dd>{{ order.payment_method }}{% if order.payment_completed %} <span class="badge bg-success">Paid</span>{% endif %}</dd></div>
+        <div><dt>Placed</dt><dd>{{ order.created_at|date:"M d, Y H:i" }}</dd></div>
+        {% if order.special_instructions %}
+        <div><dt>Instructions</dt><dd class="text-warning fw-medium">{{ order.special_instructions }}</dd></div>
+        {% endif %}
+      </dl>
+    </div>
+
+    <!-- Actions -->
+    <div class="d-flex gap-2 flex-wrap mb-3 no-print">
+      {% if has_pending and not all_cancelled %}
+      <form action="{% url 'ecomapp:vendororderbulk' order.pk %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="accept">
+        <button class="btn btn-success" onclick="return confirm('Accept all items and update stock?')">✓ Accept All</button>
+      </form>
+      <form action="{% url 'ecomapp:vendororderbulk' order.pk %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="reject">
+        <button class="btn btn-danger" onclick="return confirm('Reject all items? Stock will be restored.')">✕ Reject All</button>
+      </form>
+      {% endif %}
+      <button class="btn btn-outline-secondary" onclick="window.print()">🖨️ Print Invoice</button>
+    </div>
+
+    <!-- Your Items -->
+    <div class="surface-card p-4 mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 fw-bold mb-0">Your Items ({{ item_count }})</h2>
+        {% if all_accepted %}
+        <span class="badge bg-success">All Accepted</span>
+        {% elif all_cancelled %}
+        <span class="badge bg-danger">All Cancelled</span>
+        {% endif %}
+      </div>
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Subtotal</th>
+            <th>Status</th>
+            <th class="no-print"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cp in line_items %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ cp.product.title }}</td>
+            <td>{{ cp.quantity }}</td>
+            <td>Rs. {{ cp.rate }}</td>
+            <td>Rs. {{ cp.subtotal }}</td>
+            <td>
+              <span class="badge
+                {% if cp.vendor_status == 'Order Completed' %}bg-success
+                {% elif cp.vendor_status == 'Order Processing' %}bg-info
+                {% elif cp.vendor_status == 'Order Cancelled' %}bg-danger
+                {% elif cp.vendor_status == 'On the way' %}bg-primary
+                {% else %}bg-warning text-dark{% endif %}
+                cp-status" id="cp-status-{{ cp.id }}">
+                {{ cp.vendor_status }}
+              </span>
+            </td>
+            <td class="no-print">
+              <select class="form-select form-select-sm cp-status-select" data-cp-id="{{ cp.id }}" style="width:auto;">
+                {% for st in all_statuses %}
+                <option value="{{ st.0 }}" {% if cp.vendor_status == st.0 %}selected{% endif %}>{{ st.1 }}</option>
+                {% endfor %}
+              </select>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7">No items from your kitchen in this order.</td></tr>
+          {% endfor %}
+        </tbody>
+        {% if line_items %}
+        <tfoot>
+          <tr class="fw-bold">
+            <td colspan="4" class="text-end">Your Items Total</td>
+            <td>Rs. {{ items_subtotal }}</td>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
+        {% endif %}
+      </table>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="surface-card p-4 mb-3">
+      <h2 class="h5 fw-bold mb-3">Order Summary</h2>
+      <dl class="detail-list">
+        <div><dt>Subtotal</dt><dd>Rs. {{ order.subtotal }}</dd></div>
+        {% if order.discount %}
+        <div><dt>Discount</dt><dd class="text-danger">- Rs. {{ order.discount }}</dd></div>
+        {% endif %}
+        {% if order.delivery_fee %}
+        <div><dt>Delivery Fee</dt><dd>Rs. {{ order.delivery_fee }}</dd></div>
+        {% endif %}
+        <div><dt class="fw-bold">Total</dt><dd class="fw-bold" style="font-size:1.1rem;">Rs. {{ order.total }}</dd></div>
+        <div><dt>Platform Commission</dt><dd>Rs. {{ order.platform_commission }}</dd></div>
+      </dl>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCSRF() {
+  var m = document.cookie.match(/csrftoken=([^;]+)/);
+  return m ? m[1] : '';
+}
+document.querySelectorAll('.cp-status-select').forEach(function(sel) {
+  sel.addEventListener('change', function() {
+    var cpId = this.dataset.cpId;
+    var status = this.value;
+    var row = this.closest('tr');
+    fetch('{% url "ecomapp:vendororderstatus" order.pk %}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': getCSRF() },
+      body: 'cp_id=' + cpId + '&status=' + encodeURIComponent(status),
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.success) {
+        var badge = document.getElementById('cp-status-' + cpId);
+        badge.textContent = d.status;
+        var cls = 'badge ';
+        if (d.status === 'Order Completed') cls += 'bg-success';
+        else if (d.status === 'Order Processing') cls += 'bg-info';
+        else if (d.status === 'Order Cancelled') cls += 'bg-danger';
+        else if (d.status === 'On the way') cls += 'bg-primary';
+        else cls += 'bg-warning text-dark';
+        badge.className = cls;
+        showToast('Status updated to ' + d.status, 'success');
+      }
+    });
+  });
+});
+
+function showToast(msg, type) {
+  var old = document.querySelector('.ajax-toast');
+  if (old) old.remove();
+  var region = document.querySelector('.toast-region');
+  if (!region) { region = document.createElement('div'); region.className = 'toast-region'; document.body.appendChild(region); }
+  var t = document.createElement('div');
+  t.className = 'ajax-toast ajax-toast-' + (type || 'success');
+  t.innerHTML = '<span class="toast-body">' + msg + '</span><button class="toast-close" onclick="this.parentElement.remove()">&times;</button>';
+  region.appendChild(t);
+  setTimeout(function() { t.style.animation = 'toastSlideOut 0.25s ease-in forwards'; setTimeout(function(){t.remove();}, 250); }, 2000);
+}
+</script>
+{% endblock %}

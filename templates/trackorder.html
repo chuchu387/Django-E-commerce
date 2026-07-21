@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}Track Order #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">ORDER_{{ order.id }}</span>
+      <h1 class="page-title mb-0">
+        <span class="badge fs-5 px-3 py-2
+          {% if order.order_status == 'Order Completed' %}bg-success
+          {% elif order.order_status == 'Order Cancelled' %}bg-danger
+          {% elif order.order_status == 'Order Received' %}bg-warning text-dark
+          {% else %}bg-info{% endif %}">
+          {{ order.order_status }}
+        </span>
+      </h1>
+      <p class="page-lede">Placed {{ order.created_at|timesince }} ago</p>
+    </div>
+    <a class="btn btn-outline-primary" href="{% url 'ecomapp:customerprofile' %}">My Profile</a>
+  </header>
+
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+      <!-- Timeline -->
+      <div class="surface-card p-4 mb-3">
+        <h2 class="h5 fw-bold mb-3">Order Timeline</h2>
+        <div class="timeline">
+          {% for log in status_logs %}
+          <div class="timeline-item {% if forloop.last %}active{% endif %} {% if log.status == 'Order Cancelled' %}cancelled{% endif %}">
+            <div class="timeline-dot"></div>
+            <div class="timeline-status">{{ log.status }}</div>
+            <div class="timeline-time">{{ log.created_at|date:"M d, H:i" }}</div>
+            {% if log.note %}<div class="text-muted small">{{ log.note }}</div>{% endif %}
+            {% if log.updated_by != "system" %}<div class="text-muted small">by {{ log.updated_by }}</div>{% endif %}
+          </div>
+          {% empty %}
+          <p class="text-muted">No status updates yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Items -->
+      <div class="surface-card p-4 mb-3">
+        <h2 class="h5 fw-bold mb-3">Items</h2>
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr><th>#</th><th>Item</th><th>Kitchen</th><th>Qty</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            {% for cp in line_items %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ cp.product.title }}</td>
+              <td><small class="text-muted">{{ cp.product.vendor.name|default:"—" }}</small></td>
+              <td>{{ cp.quantity }}</td>
+              <td>
+                <span class="badge
+                  {% if cp.vendor_status == 'Order Completed' %}bg-success
+                  {% elif cp.vendor_status == 'Order Processing' %}bg-info
+                  {% elif cp.vendor_status == 'Order Cancelled' %}bg-danger
+                  {% elif cp.vendor_status == 'On the way' %}bg-primary
+                  {% else %}bg-warning text-dark{% endif %}">
+                  {{ cp.vendor_status }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Delivery Info -->
+      <div class="surface-card p-4">
+        <h2 class="h5 fw-bold mb-3">Delivery Info</h2>
+        <dl class="detail-list mb-0">
+          <div><dt>Name</dt><dd>{{ order.ordered_by }}</dd></div>
+          <div><dt>Address</dt><dd>{{ order.shipping_address }}</dd></div>
+          <div><dt>Payment</dt><dd>{{ order.payment_method }}{% if order.payment_completed %} <span class="badge bg-success">Paid</span>{% endif %}</dd></div>
+          <div><dt>Delivery</dt><dd>{{ order.delivery_zone|default:"Standard" }} — {% if order.delivery_fee %}Rs. {{ order.delivery_fee }}{% else %}Free{% endif %}</dd></div>
+          <div><dt>Total</dt><dd class="fw-bold" style="color:var(--theme-accent);">Rs. {{ order.total }}</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.track-status-badge { font-size: 1.25rem; padding: 0.5rem 1.5rem; border-radius: 50px; }
+.timeline { max-width: 500px; margin: 0; position: relative; padding-left: 2rem; }
+.timeline::before { content: ''; position: absolute; left: 0.75rem; top: 0; bottom: 0; width: 2px; background: var(--theme-border); }
+.timeline-item { position: relative; padding-bottom: 1.75rem; }
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-dot { position: absolute; left: -1.7rem; top: 0.25rem; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--theme-border); border: 2px solid var(--theme-surface); z-index: 1; }
+.timeline-item.active .timeline-dot { background: var(--theme-accent); box-shadow: 0 0 0 3px rgba(242,103,34,0.2); }
+.timeline-item.active .timeline-status { font-weight: 600; color: var(--theme-accent); }
+.timeline-item.cancelled .timeline-dot { background: #dc3545; box-shadow: 0 0 0 3px rgba(220,53,69,0.2); }
+.timeline-item.cancelled .timeline-status { font-weight: 600; color: #dc3545; }
+.timeline-time { font-size: 0.8rem; color: var(--theme-muted); }
+</style>
+{% endblock %}

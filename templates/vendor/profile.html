@@ -1,0 +1,29 @@
+{% extends 'vendor_base.html' %}
+{% block title %}Profile Settings{% endblock %}
+
+{% block content %}
+<div class="page-shell-narrow">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Kitchen Portal</span>
+      <h1 class="page-title mb-0">Profile Settings</h1>
+      <p class="page-lede">Update your kitchen's public information and contact details.</p>
+    </div>
+  </header>
+
+  <div class="surface-card p-4">
+    <form action="" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label fw-medium">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+          {% for err in field.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary w-100 mt-2">Save Changes</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

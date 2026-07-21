@@ -1,0 +1,54 @@
+{% extends 'vendor_base.html' %}
+{% block title %}Payout History{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Kitchen Portal</span>
+      <h1 class="page-title mb-0">Payout History</h1>
+      <p class="page-lede">View your earnings and payout records.</p>
+    </div>
+  </header>
+
+  <div class="surface-card p-3">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Amount</th>
+            <th>Period</th>
+            <th>Status</th>
+            <th>Paid On</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in payouts %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td class="fw-bold">Rs. {{ p.amount }}</td>
+            <td><small>{{ p.period_start|date:"M d" }} – {{ p.period_end|date:"M d, Y" }}</small></td>
+            <td>
+              <span class="badge {% if p.status == 'paid' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                {{ p.get_status_display }}
+              </span>
+            </td>
+            <td><small>{{ p.paid_at|date:"M d, Y"|default:"—" }}</small></td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <h2>No payouts yet</h2>
+                <p>Payouts will appear here once your orders are completed and processed.</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

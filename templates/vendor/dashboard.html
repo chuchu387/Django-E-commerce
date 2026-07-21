@@ -1,0 +1,203 @@
+{% extends 'vendor_base.html' %}
+{% block title %}{{ vendor.name }} Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Kitchen Portal</span>
+      <h1 class="page-title mb-0">{{ vendor.name }}</h1>
+      <p class="page-lede">Manage your products, orders, promotions, and earnings.</p>
+    </div>
+    <div class="d-flex gap-2">
+      {% if vendor.is_on_vacation %}
+      <span class="badge bg-warning fs-6" style="padding:0.4rem 1rem;">🌴 Vacation Mode</span>
+      {% endif %}
+      <form action="{% url 'ecomapp:vendortogglevacation' %}" method="post">
+        {% csrf_token %}
+        <button class="btn btn-sm btn-outline-warning">
+          {% if vendor.is_on_vacation %}✓ Resume Orders{% else %}🌴 Vacation Mode{% endif %}
+        </button>
+      </form>
+    </div>
+  </header>
+
+  {% if vendor.is_on_vacation %}
+  <div class="alert alert-warning d-flex align-items-center gap-2 mb-4">
+    <span>🌴</span>
+    <strong>Vacation mode is ON.</strong> Your products are hidden from customers. Click "Resume Orders" above to go live again.
+  </div>
+  {% endif %}
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <span class="kpi-icon">📦</span>
+      <div>
+        <strong class="kpi-value">{{ product_count }}</strong>
+        <span class="kpi-label">Products</span>
+        {% if pending_products %}
+        <small class="text-warning d-block">{{ pending_products }} pending approval</small>
+        {% endif %}
+      </div>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-icon">📋</span>
+      <div>
+        <strong class="kpi-value">{{ total_orders }}</strong>
+        <span class="kpi-label">Total Orders</span>
+      </div>
+    </div>
+    <div class="kpi-card kpi-warn">
+      <span class="kpi-icon">⏳</span>
+      <div>
+        <strong class="kpi-value">{{ pending_orders }}</strong>
+        <span class="kpi-label">Pending</span>
+      </div>
+    </div>
+    <div class="kpi-card kpi-info">
+      <span class="kpi-icon">🔥</span>
+      <div>
+        <strong class="kpi-value">{{ preparing_orders }}</strong>
+        <span class="kpi-label">Preparing</span>
+      </div>
+    </div>
+    <div class="kpi-card kpi-success">
+      <span class="kpi-icon">✅</span>
+      <div>
+        <strong class="kpi-value">{{ today_orders }}</strong>
+        <span class="kpi-label">Today</span>
+      </div>
+    </div>
+    <div class="kpi-card kpi-accent">
+      <span class="kpi-icon">💰</span>
+      <div>
+        <strong class="kpi-value">Rs. {{ net_earnings }}</strong>
+        <span class="kpi-label">Net Earnings</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Low Stock Alerts -->
+  {% if low_stock_products %}
+  <div class="surface-card p-4 mb-4" style="border-left:4px solid #dc3545;">
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <span style="font-size:1.25rem;">⚠️</span>
+      <h2 class="h5 fw-bold mb-0">Low Stock Alert</h2>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm align-middle mb-0">
+        <thead>
+          <tr><th>Product</th><th>Stock</th><th>Threshold</th><th></th></tr>
+        </thead>
+        <tbody>
+          {% for p in low_stock_products %}
+          <tr>
+            <td>{{ p.title }}</td>
+            <td><span class="badge bg-danger">{{ p.stock }}</span></td>
+            <td>{{ p.low_stock_threshold }}</td>
+            <td><a href="{% url 'ecomapp:vendorproductedit' p.pk %}" class="btn btn-sm btn-outline-primary">Restock</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="profile-grid">
+    <!-- Earnings -->
+    <aside class="surface-card">
+      <h2 class="h5 fw-bold mb-3">Earnings</h2>
+      <dl class="detail-list">
+        <div><dt>Gross sales</dt><dd>Rs. {{ gross_sales }}</dd></div>
+        <div><dt>Platform fee</dt><dd class="text-danger">- Rs. {{ total_commission }}</dd></div>
+        <div><dt>Net earnings</dt><dd class="fw-bold" style="color:var(--theme-accent);">Rs. {{ net_earnings }}</dd></div>
+        {% if pending_payouts %}
+        <div><dt>Pending payout</dt><dd class="text-warning">Rs. {{ pending_payouts }}</dd></div>
+        {% endif %}
+      </dl>
+      <hr>
+      <h2 class="h5 fw-bold mb-3">Quick Links</h2>
+      <nav class="d-flex flex-column gap-1">
+        <a href="{% url 'ecomapp:vendorproducts' %}" class="btn btn-outline-primary btn-sm text-start">Manage Products</a>
+        <a href="{% url 'ecomapp:vendorproductadd' %}" class="btn btn-outline-primary btn-sm text-start">Add New Product</a>
+        <a href="{% url 'ecomapp:vendorcoupons' %}" class="btn btn-outline-primary btn-sm text-start">Create Coupon</a>
+        <a href="{% url 'ecomapp:vendororders' %}" class="btn btn-outline-primary btn-sm text-start">View Orders</a>
+        <a href="{% url 'ecomapp:vendorsalesreport' %}" class="btn btn-outline-secondary btn-sm text-start">Download Sales Report (CSV)</a>
+      </nav>
+    </aside>
+
+    <section class="surface-card">
+      <!-- Top Products -->
+      {% if top_products %}
+      <div class="section-head">
+        <h2>Top Selling</h2>
+      </div>
+      <div class="table-responsive mb-4">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr><th>#</th><th>Product</th><th>Sold</th></tr>
+          </thead>
+          <tbody>
+            {% for tp in top_products %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ tp.product__title }}</td>
+              <td><strong>{{ tp.total_qty }}</strong></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+
+      <!-- Recent Orders -->
+      <div class="section-head">
+        <h2>Recent Orders</h2>
+        <a href="{% url 'ecomapp:vendororders' %}" class="small">View all</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr><th>Order</th><th>Customer</th><th>Status</th><th>Total</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for ord in recent_orders %}
+            <tr>
+              <td>ORDER_{{ ord.id }}</td>
+              <td>{{ ord.ordered_by }}</td>
+              <td><span class="badge bg-info">{{ ord.order_status }}</span></td>
+              <td>Rs. {{ ord.total }}</td>
+              <td><a href="{% url 'ecomapp:vendororderdetail' ord.pk %}" class="btn btn-sm btn-outline-primary">View</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5"><div class="empty-state"><h2>No orders yet</h2></div></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Recent Reviews -->
+      {% if recent_reviews %}
+      <div class="mt-4">
+        <div class="section-head">
+          <h2>Recent Reviews</h2>
+        </div>
+        {% for r in recent_reviews %}
+        <div class="d-flex gap-2 align-items-start mb-2 p-2 rounded" style="background:var(--theme-bg);">
+          <div class="avatar-circle" style="width:36px;height:36px;min-width:36px;background:var(--theme-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;border-radius:50%;">{{ r.customer.full_name|first|upper }}</div>
+          <div>
+            <strong style="font-size:0.9rem;">{{ r.customer.full_name }}</strong>
+            <small class="text-muted"> on {{ r.product.title }}</small>
+            <div class="star-rating" style="font-size:0.85rem;">{% for i in "12345" %}{% if forloop.counter <= r.rating %}★{% else %}☆{% endif %}{% endfor %}</div>
+            {% if r.text %}<p class="mb-0 small">{{ r.text|truncatechars:120 }}</p>{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

@@ -1,8 +1,16 @@
 {% extends 'base.html' %}
-{% block title %}Add To Cart{% endblock %}
+{% block title %}Added to Cart{% endblock %}
 
 {% block content %}
-<div class="container">
-  <h3>Product added to the cart successfully</h3>
+<div class="page-shell">
+  <div class="surface-card text-center">
+    <span class="page-kicker">Added</span>
+    <h1 class="page-title">Product added to cart</h1>
+    <p class="page-lede mx-auto">Your item is ready for checkout. Continue shopping or review your cart.</p>
+    <div class="d-flex justify-content-center flex-wrap gap-2 mt-4">
+      <a class="btn btn-outline-primary" href="{% url 'ecomapp:products' %}">Continue Shopping</a>
+      <a class="btn btn-primary" href="{% url 'ecomapp:mycart' %}">View Cart</a>
+    </div>
+  </div>
 </div>
 {% endblock %}

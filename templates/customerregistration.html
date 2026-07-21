@@ -1,21 +1,37 @@
 {% extends 'base.html' %}
-{% block title %}Customer Registration {% endblock %}
+{% block title %}Create Account{% endblock %}
+
 {% block content %}
-<style>
-    .errorlist{
-        color: red;
-</style>
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 mx-auto">
-            <form action="" method="post">
-                <h3>Customer Registration</h3>
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button class="bth btn-info">Registraton as a customer</button>
-            </form>
-            <p>Already have an acoount? <a href="{% url 'ecomapp:customerlogin' %}">Register Here</a></p>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-icon">🍽️</div>
+    <h1 class="auth-title">Create your account</h1>
+    <p class="auth-subtitle">Save your details and track every order from your profile.</p>
+    <form action="" method="post">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        {% for e in form.non_field_errors %}
+          <div class="form-error" style="margin-bottom:0.75rem">{{ e }}</div>
+        {% endfor %}
+      {% endif %}
+      {% for field in form %}
+        <div class="auth-field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <div class="form-help">{{ field.help_text }}</div>
+          {% endif %}
+          {% for error in field.errors %}
+            <div class="form-error">{{ error }}</div>
+          {% endfor %}
         </div>
+      {% endfor %}
+      <button class="btn btn-primary w-100 auth-btn">Create Account</button>
+    </form>
+    <div class="auth-footer">
+      <span>Already have an account?</span>
+      <a href="{% url 'ecomapp:customerlogin' %}">Login here</a>
     </div>
+  </div>
 </div>
 {% endblock %}

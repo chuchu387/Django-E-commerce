@@ -1,0 +1,53 @@
+{% extends 'adminpages/adminbase.html' %}
+{% block title %}Vendor Payouts{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Vendor Payouts</h2>
+  <a href="{% url 'ecomapp:adminhome' %}" class="btn btn-outline-secondary btn-sm">Dashboard</a>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-bordered align-middle">
+    <thead>
+      <tr>
+        <th>Vendor</th>
+        <th>Amount</th>
+        <th>Period</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th>Paid</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in payouts %}
+      <tr>
+        <td>{{ p.vendor.name }}</td>
+        <td>Rs. {{ p.amount }}</td>
+        <td>{{ p.period_start|date:"M d" }} — {{ p.period_end|date:"M d, Y" }}</td>
+        <td>
+          {% if p.status == "paid" %}
+            <span class="badge bg-success">Paid</span>
+          {% else %}
+            <span class="badge bg-warning">Pending</span>
+          {% endif %}
+        </td>
+        <td>{{ p.created_at|date:"M d, Y" }}</td>
+        <td>{{ p.paid_at|date:"M d, Y"|default:"—" }}</td>
+        <td>
+          {% if p.status == "pending" %}
+          <form action="{% url 'ecomapp:adminmarkpayoutpaid' p.pk %}" method="post" onsubmit="return confirm('Mark this payout as paid?')">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success btn-sm">Mark Paid</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" class="text-center">No payouts yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

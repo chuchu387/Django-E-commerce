@@ -2,57 +2,231 @@
 {% block title %}Checkout{% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-    <h1 class="page-title mb-0">Checkout</h1>
+<div class="page-shell">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Checkout</span>
+      <h1 class="page-title mb-0">Confirm delivery details</h1>
+      <p class="page-lede">Review your cart, enter shipping information, and choose how you want to pay.</p>
+    </div>
     <a class="btn btn-outline-primary" href="{% url 'ecomapp:mycart' %}">Update Cart</a>
+  </header>
+
+  <div class="checkout-trust-row">
+    <div><strong>30-45 min</strong><span>Estimated delivery</span></div>
+    <div><strong>Secure</strong><span>Cash or Khalti payment</span></div>
+    <div><strong>Fresh</strong><span>Prepared after checkout</span></div>
   </div>
 
-  <div class="row g-4">
-    <div class="col-lg-7">
-      <div class="card border-0 p-3 p-md-4 h-100">
-        <h2 class="h5 mb-3">Order Summary</h2>
-        <div class="table-responsive">
-          <table class="table align-middle mb-0">
-            <thead>
+  <div class="checkout-layout">
+    <section class="surface-card">
+      <h2 class="h5 fw-bold mb-3">Order Summary</h2>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Vendor</th>
+              <th>Rate</th>
+              <th>Qty</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cp in cart.cartproduct_set.all %}
               <tr>
-                <th>SN</th>
-                <th>Product</th>
-                <th>Rate</th>
-                <th>Quantity</th>
-                <th>Subtotal</th>
+                <td>
+                  <div class="cart-product-cell">
+                    <img src="{{ cp.product.image.url }}" alt="{{ cp.product.title }}">
+                    <div>
+                      <strong>{{ cp.product.title }}</strong>
+                      <span>{{ cp.product.category.title }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td><small class="text-muted">{{ cp.product.vendor.name|default:"BhokLagyao" }}</small></td>
+                <td>Rs. {{ cp.rate }}</td>
+                <td>{{ cp.quantity }}</td>
+                <td>Rs. {{ cp.subtotal }}</td>
               </tr>
-            </thead>
-            <tbody>
-              {% for cp in cart.cartproduct_set.all %}
-                <tr>
-                  <td>{{ forloop.counter }}</td>
-                  <td class="fw-semibold">{{ cp.product.title }}</td>
-                  <td>Rs. {{ cp.rate }}</td>
-                  <td>{{ cp.quantity }}</td>
-                  <td>Rs. {{ cp.subtotal }}</td>
-                </tr>
-              {% endfor %}
-              <tr>
-                <th colspan="4" class="text-end">Total</th>
-                <th>Rs. {{ cart.total }}</th>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            {% endfor %}
+            <tr>
+              <th colspan="4" class="text-end">Subtotal</th>
+              <th id="subtotal-amount">Rs. {{ cart.total }}</th>
+            </tr>
+            <tr id="discount-row" style="display:none;">
+              <th colspan="4" class="text-end text-success">Discount <span id="coupon-code-display"></span></th>
+              <th id="discount-amount" class="text-success">- Rs. 0</th>
+            </tr>
+            <tr id="delivery-fee-row">
+              <th colspan="4" class="text-end">Delivery fee</th>
+              <th id="delivery-fee-amount">{% if delivery_fee %}Rs. {{ delivery_fee }}{% else %}Free{% endif %}</th>
+            </tr>
+            <tr>
+              <th colspan="4" class="text-end">Total payable</th>
+              <th id="grand-total-amount">Rs. {{ grand_total }}</th>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </div>
 
-    <div class="col-lg-5">
-      <div class="card border-0 p-4 h-100 checkout-card">
-        <h2 class="h5 mb-3 text-center">Shipping & Payment</h2>
-        <form action="" method="post" class="checkout-form">
-          {% csrf_token %}
-          {{ form.as_p }}
-          <button type="submit" class="btn btn-primary w-100 mt-2">Place Order</button>
-        </form>
+      <!-- Coupon Section -->
+      <div class="checkout-coupon mt-3">
+        <div class="coupon-input-group">
+          <input type="text" id="coupon-input" class="form-control" placeholder="Enter coupon code" autocomplete="off">
+          <button id="apply-coupon-btn" class="btn btn-outline-primary">Apply</button>
+        </div>
+        <div id="coupon-feedback" class="small mt-1"></div>
       </div>
-    </div>
+
+      <div class="checkout-note" id="delivery-note">
+        <strong>Delivery note</strong>
+        <p id="delivery-note-text">Select a delivery zone above to see your fee.</p>
+      </div>
+    </section>
+
+    <aside class="surface-card">
+      <h2 class="h5 fw-bold mb-3">Shipping & Payment</h2>
+
+      {% if addresses %}
+      <div class="mb-3">
+        <label class="form-label fw-bold small">Saved addresses</label>
+        <select id="saved-address-select" class="form-control">
+          <option value="">-- Select a saved address --</option>
+          {% for addr in addresses %}
+          <option value="{{ addr.id }}" data-name="{{ addr.full_name }}" data-mobile="{{ addr.mobile }}" data-street="{{ addr.street_address }}" data-city="{{ addr.city }}" data-zone="{{ addr.delivery_zone_id }}">{{ addr.label }} — {{ addr.street_address }}, {{ addr.city }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      <form action="" method="post" class="checkout-form" data-ajax="0">
+        {% csrf_token %}
+        <input type="hidden" name="coupon_code" id="hidden-coupon-code" value="">
+        {% include "includes/form_fields.html" %}
+        <button type="submit" class="btn btn-primary w-100 mt-2" data-loading-text="Placing order...">Place Order</button>
+      </form>
+    </aside>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Coupon AJAX apply
+  var couponInput = document.getElementById('coupon-input');
+  var applyBtn = document.getElementById('apply-coupon-btn');
+  var couponFeedback = document.getElementById('coupon-feedback');
+  var hiddenCoupon = document.getElementById('hidden-coupon-code');
+  var discountRow = document.getElementById('discount-row');
+  var discountAmount = document.getElementById('discount-amount');
+  var couponDisplay = document.getElementById('coupon-code-display');
+  var grandTotalEl = document.getElementById('grand-total-amount');
+  var subtotalEl = document.getElementById('subtotal-amount');
+  var feeEl = document.getElementById('delivery-fee-amount');
+  var zoneSelect = document.getElementById('id_delivery_zone');
+
+  function getFee() {
+    var t = feeEl.textContent.trim();
+    if (t === 'Free') return 0;
+    return parseInt(t.replace(/[^0-9]/g,'')) || 0;
+  }
+  function getSubtotal() {
+    return parseInt(subtotalEl.textContent.replace(/[^0-9]/g,'')) || 0;
+  }
+  function updateGrandTotal(discount) {
+    var sub = getSubtotal();
+    var fee = getFee();
+    var total = sub + fee - (discount || 0);
+    grandTotalEl.textContent = 'Rs. ' + total;
+  }
+
+  applyBtn.addEventListener('click', function() {
+    var code = couponInput.value.trim();
+    if (!code) { couponFeedback.textContent = 'Enter a coupon code.'; couponFeedback.style.color = '#dc3545'; return; }
+    applyBtn.disabled = true;
+    applyBtn.textContent = 'Checking...';
+    fetch('{% url "ecomapp:validatecoupon" %}?code=' + encodeURIComponent(code))
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        applyBtn.disabled = false;
+        applyBtn.textContent = 'Apply';
+        if (d.valid) {
+          hiddenCoupon.value = code;
+          couponFeedback.innerHTML = '✓ Coupon applied! <strong>' + d.code + '</strong> — save Rs. ' + d.discount;
+          couponFeedback.style.color = '#198754';
+          discountRow.style.display = '';
+          discountAmount.textContent = '- Rs. ' + d.discount;
+          couponDisplay.textContent = '(' + d.code + ')';
+          updateGrandTotal(d.discount);
+        } else {
+          hiddenCoupon.value = '';
+          couponFeedback.textContent = d.error || 'Invalid coupon.';
+          couponFeedback.style.color = '#dc3545';
+          discountRow.style.display = 'none';
+          updateGrandTotal(0);
+        }
+      })
+      .catch(function() {
+        applyBtn.disabled = false;
+        applyBtn.textContent = 'Apply';
+        couponFeedback.textContent = 'Could not validate coupon.';
+        couponFeedback.style.color = '#dc3545';
+      });
+  });
+
+  // Saved address auto-fill
+  var addrSelect = document.getElementById('saved-address-select');
+  if (addrSelect) {
+    addrSelect.addEventListener('change', function() {
+      var opt = this.options[this.selectedIndex];
+      if (!opt.value) return;
+      document.getElementById('id_ordered_by').value = opt.dataset.name;
+      document.getElementById('id_mobile').value = opt.dataset.mobile;
+      document.getElementById('id_shipping_address').value = opt.dataset.street + ', ' + opt.dataset.city;
+      if (opt.dataset.zone && zoneSelect) {
+        zoneSelect.value = opt.dataset.zone;
+        zoneSelect.dispatchEvent(new Event('change'));
+      }
+    });
+  }
+
+  // Delivery zone change -> update fee via AJAX
+  if (zoneSelect) {
+    zoneSelect.addEventListener('change', function() {
+      var zoneId = this.value;
+      if (!zoneId) {
+        feeEl.textContent = 'Rs. 0';
+        updateGrandTotal(hiddenCoupon.value ? null : 0);
+        document.getElementById('delivery-note-text').textContent = 'Select a delivery zone to see your fee.';
+        return;
+      }
+      fetch('{% url "ecomapp:deliveryzonefee" %}?zone_id=' + zoneId)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          feeEl.textContent = data.fee > 0 ? 'Rs. ' + data.fee : 'Free';
+          updateGrandTotal(hiddenCoupon.value ? null : 0);
+          if (data.fee === 0 && data.total >= data.min_free) {
+            document.getElementById('delivery-note-text').textContent = 'Free delivery! Your order qualifies for no-charge delivery in ' + data.zone_name + '.';
+          } else {
+            document.getElementById('delivery-note-text').textContent = 'Delivery fee for ' + data.zone_name + ' applies. Free above Rs. ' + data.min_free + '.';
+          }
+        });
+    });
+  }
+});
+</script>
+
+<style>
+.checkout-coupon {
+  border-top: 1px solid var(--theme-border);
+  padding-top: 1rem;
+}
+.coupon-input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+.coupon-input-group input {
+  flex: 1;
+}
+</style>
 {% endblock %}

@@ -1,26 +1,38 @@
 {% extends 'base.html' %}
-{% block title %} Customer Login {% endblock %}
+{% block title %}Customer Login{% endblock %}
+
 {% block content %}
-<style>
-    .errorlist {
-        color: red;
-    }
-</style>
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 mx-auto">
-            <form action="" method="post">
-                <h3>Customer Login Form</h3>
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button class="btn btn-info">Login as a customer</button>
-                {% if error %}
-                <p style="color: red;">{{ error }}</p>
-                {% endif %}
-            </form>
-            <p>Forget Password?<a href="{% url 'ecomapp:passwordforgot' %}">Reset Now</a> </p>
-            <p>or don't have an account? <a href="{% url 'ecomapp:customerregistration' %}{% if request.GET.next %}?next={{request.GET.next}}{% endif %}">Register Here</a></p>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-icon">👋</div>
+    <h1 class="auth-title">Welcome back</h1>
+    <p class="auth-subtitle">Sign in to view your profile, order history, and saved cart.</p>
+    <form action="" method="post">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        {% for e in form.non_field_errors %}
+          <div class="form-error" style="margin-bottom:0.75rem">{{ e }}</div>
+        {% endfor %}
+      {% endif %}
+      {% for field in form %}
+        <div class="auth-field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% for error in field.errors %}
+            <div class="form-error">{{ error }}</div>
+          {% endfor %}
         </div>
+      {% endfor %}
+      {% if error %}
+        <div class="form-error" style="margin-bottom:0.75rem">{{ error }}</div>
+      {% endif %}
+      <button class="btn btn-primary w-100 auth-btn">Login</button>
+    </form>
+    <div class="auth-footer">
+      <a href="{% url 'ecomapp:passwordforgot' %}">Forgot password?</a>
+      <span class="mx-2">·</span>
+      <a href="{% url 'ecomapp:customerregistration' %}{% if request.GET.next %}?next={{request.GET.next}}{% endif %}">Create account</a>
     </div>
+  </div>
 </div>
 {% endblock %}

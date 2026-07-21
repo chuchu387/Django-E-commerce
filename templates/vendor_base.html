@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block body_attrs %} class="vendor-layout"{% endblock %}
+
+{% block header %}
+<aside class="vendor-sidebar">
+  <div class="vendor-sidebar-brand">
+    <img src="/static/images/bhoklagyao-logo.svg" alt="BhokLagyao" height="28">
+    <span>Vendor Portal</span>
+  </div>
+  <nav class="vendor-sidebar-nav">
+    <a href="{% url 'ecomapp:vendordashboard' %}" class="{% if request.resolver_match.url_name == 'vendordashboard' %}active{% endif %}">
+      <span class="vs-icon">📊</span> Dashboard
+    </a>
+    <a href="{% url 'ecomapp:vendorproducts' %}" class="{% if request.resolver_match.url_name == 'vendorproducts' or request.resolver_match.url_name == 'vendorproductadd' or request.resolver_match.url_name == 'vendorproductedit' %}active{% endif %}">
+      <span class="vs-icon">📦</span> Products
+    </a>
+    <a href="{% url 'ecomapp:vendororders' %}" class="{% if request.resolver_match.url_name == 'vendororders' or request.resolver_match.url_name == 'vendororderdetail' %}active{% endif %}">
+      <span class="vs-icon">📋</span> Orders
+    </a>
+    <a href="{% url 'ecomapp:vendorcoupons' %}" class="{% if request.resolver_match.url_name == 'vendorcoupons' or request.resolver_match.url_name == 'vendorcouponadd' %}active{% endif %}">
+      <span class="vs-icon">🏷️</span> Coupons
+    </a>
+    <a href="{% url 'ecomapp:vendorprofile' %}" class="{% if request.resolver_match.url_name == 'vendorprofile' %}active{% endif %}">
+      <span class="vs-icon">⚙️</span> Profile
+    </a>
+    <a href="{% url 'ecomapp:vendorbusinesshours' %}" class="{% if request.resolver_match.url_name == 'vendorbusinesshours' %}active{% endif %}">
+      <span class="vs-icon">🕐</span> Hours
+    </a>
+    <a href="{% url 'ecomapp:vendorchangepassword' %}" class="{% if request.resolver_match.url_name == 'vendorchangepassword' %}active{% endif %}">
+      <span class="vs-icon">🔑</span> Password
+    </a>
+    <a href="{% url 'ecomapp:vendorpayouts' %}" class="{% if request.resolver_match.url_name == 'vendorpayouts' %}active{% endif %}">
+      <span class="vs-icon">💰</span> Payouts
+    </a>
+  </nav>
+  <div class="vendor-sidebar-footer">
+    <div class="vendor-sidebar-user">
+      <div class="vs-avatar">{{ request.user.vendor.name|first|upper }}</div>
+      <div>
+        <strong>{{ request.user.vendor.name }}</strong>
+        <small>Kitchen</small>
+      </div>
+    </div>
+    <a href="{% url 'ecomapp:vendorlogout' %}" class="vs-logout">🚪 Logout</a>
+    <a href="{% url 'ecomapp:home' %}" class="vs-back">← View site</a>
+  </div>
+</aside>
+{% endblock %}
+
+{% block footer %}{% endblock %}

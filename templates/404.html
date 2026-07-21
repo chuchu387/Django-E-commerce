@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Page Not Found{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+  <section class="page-hero error-hero">
+    <div>
+      <span class="page-kicker">404</span>
+      <h1 class="page-title mb-0">This page is not on the menu</h1>
+      <p class="page-lede">The link may be old, the product may have moved, or the address may be typed incorrectly.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-primary" href="{% url 'ecomapp:products' %}">Browse Products</a>
+      <a class="btn btn-outline-primary" href="{% url 'ecomapp:home' %}">Go Home</a>
+    </div>
+  </section>
+
+  <div class="surface-card">
+    <div class="section-head">
+      <h2>Try these instead</h2>
+    </div>
+    <div class="category_nav">
+      <a class="category_chip" href="{% url 'ecomapp:products' %}">All Products</a>
+      <a class="category_chip" href="{% url 'ecomapp:allproducts' %}">Categories</a>
+      <a class="category_chip" href="{% url 'ecomapp:mycart' %}">Cart</a>
+      <a class="category_chip" href="{% url 'ecomapp:about' %}">About</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

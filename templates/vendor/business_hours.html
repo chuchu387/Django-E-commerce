@@ -1,0 +1,59 @@
+{% extends 'vendor_base.html' %}
+{% block title %}Business Hours{% endblock %}
+
+{% block content %}
+<div class="page-shell-narrow">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Kitchen Portal</span>
+      <h1 class="page-title mb-0">Business Hours</h1>
+      <p class="page-lede">Set when your kitchen is open. Products are unavailable outside these hours.</p>
+    </div>
+  </header>
+
+  <div class="surface-card p-4">
+    <form action="" method="post">
+      {% csrf_token %}
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Closed</th>
+              <th>Open</th>
+              <th>Close</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for day_num, day_name, h in hours_list %}
+            <tr>
+              <td class="fw-medium">{{ day_name }}</td>
+              <td>
+                <input type="checkbox" name="closed_{{ day_num }}" class="form-check-input day-closed" {% if h and h.is_closed %}checked{% endif %}>
+              </td>
+              <td>
+                <input type="time" name="open_{{ day_num }}" class="form-control time-input" style="width:140px;" value="{% if h and h.open_time %}{{ h.open_time|time:'H:i' }}{% endif %}" {% if h and h.is_closed %}disabled{% endif %}>
+              </td>
+              <td>
+                <input type="time" name="close_{{ day_num }}" class="form-control time-input" style="width:140px;" value="{% if h and h.close_time %}{{ h.close_time|time:'H:i' }}{% endif %}" {% if h and h.is_closed %}disabled{% endif %}>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <button type="submit" class="btn btn-primary w-100 mt-3">Save Hours</button>
+    </form>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.day-closed').forEach(function(cb) {
+  cb.addEventListener('change', function() {
+    var row = this.closest('tr');
+    var inputs = row.querySelectorAll('.time-input');
+    inputs.forEach(function(inp) { inp.disabled = cb.checked; });
+  });
+});
+</script>
+{% endblock %}

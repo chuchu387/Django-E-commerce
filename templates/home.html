@@ -1,568 +1,510 @@
-<!DOCTYPE html>
-<html>
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}BhokLagyao{% endblock %}
+{% block meta_description %}BhokLagyao helps customers discover fresh meals, browse dishes, add to cart, and order food online.{% endblock %}
+{% block og_title %}BhokLagyao{% endblock %}
+{% block og_description %}Fresh meals, local favorites, and fast ordering from BhokLagyao.{% endblock %}
 
-<head>
-  <!-- Basic -->
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <!-- Mobile Metas -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <!-- Site Metas -->
-  <meta name="keywords" content="" />
-  <meta name="description" content="" />
-  <meta name="author" content="" />
-  <title>Bhok Lagyao</title>
-  <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css" />
-  <link href="https://fonts.googleapis.com/css?family=Poppins:400,600,700&display=swap" rel="stylesheet">
-  <link href="/static/css/font-awesome.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css" integrity="sha256-mLBIhmBvigTFWPSCtvdu6a76T+3Xyt+K571hupeFLg4=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css" integrity="sha256-UK1EiopXIL+KVhfbFa8xrmAWPeBjMVdvYMYkTAEv/HI=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css.map" integrity="undefined" crossorigin="anonymous" />
+{% block extra_head %}
+<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css" />
+<link href="https://fonts.googleapis.com/css?family=Poppins:400,600,700&display=swap" rel="stylesheet">
+<link href="/static/css/font-awesome.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css" integrity="sha256-mLBIhmBvigTFWPSCtvdu6a76T+3Xyt+K571hupeFLg4=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css" integrity="sha256-UK1EiopXIL+KVhfbFa8xrmAWPeBjMVdvYMYkTAEv/HI=" crossorigin="anonymous" />
+<link href="/static/css/style.css?v=full-recovered-20260721" rel="stylesheet" />
+<link href="/static/css/responsive.css?v=full-recovered-20260721" rel="stylesheet" />
+<link href="/static/css/home.css?v=full-recovered-20260721" rel="stylesheet" />
+{% endblock %}
 
-
-  <link href="/static/css/style.css" rel="stylesheet" />
-  <link href="/static/css/responsive.css" rel="stylesheet" />
-  <link href="/static/css/ui.css" rel="stylesheet" />
-
-</head>
-
-<body>
-
-  <div class="hero_area">
-    <header class="header_section">
-      <div class="container-fluid">
-        <nav class="navbar navbar-expand-lg custom_nav-container">
-          <a class="navbar-brand" href="{% url 'ecomapp:home' %}">
-            <span>
-              BhokLagyao
-            </span>
-          </a>
-          <p class="header_tagline">Hungry? Your next meal is moments away.</p>
-          <div class="" id="">
-            <div class="User_option">
-                {% if request.user.is_authenticated %}
-                <a style="text-align: center; display: block;" class="text-decoration-none" href="{% url 'ecomapp:customerprofile' %}">Welcome, {{request.user.username}}!</a>
-                {% else %}
-                <a style="text-align: center; display: block;" class="text-decoration-none" href="{% url 'ecomapp:customerlogin' %}">Login / Register</a>
-                {% endif %}
-            </div>
-            <div class="custom_menu-btn">
-              <button onclick="openNav()">
-                <img src="/static/images/menu.png" alt="">
-              </button>
-            </div>
-            <div id="myNav" class="overlay">
-              <div class="overlay-content">
-                <a href="{% url 'ecomapp:home' %}">Home</a>
-                <a href="{% url 'ecomapp:about' %}">About</a>
-                <a href="{% url 'ecomapp:allproducts' %}">Categories</a>
-                <a href="{% url 'ecomapp:mycart' %}">Cart</a>
-                {% if request.user.customer %}
-
-                <a href="{% url 'ecomapp:customerprofile' %}">My Profile</a>
-                <a href="{% url 'ecomapp:customerlogout' %}">Logout</a>
-                {% else %}
-                <a href="{% url 'ecomapp:customerregistration' %}">Register</a>
-                <a href="{% url 'ecomapp:customerlogin' %}">Login</a>
-                {% endif %}
-              </div>
+{% block header %}
+<div class="hero_area">
+  <header class="header_section">
+    <div class="container-fluid">
+      <nav class="navbar navbar-expand-lg custom_nav-container">
+        <a class="navbar-brand" href="{% url 'ecomapp:home' %}">
+          <img src="/static/images/bhoklagyao-logo.svg?v=full-recovered-20260721" alt="BhokLagyao">
+        </a>
+        <div class="home_nav-links">
+          <a href="{% url 'ecomapp:home' %}">Home</a>
+          <a href="{% url 'ecomapp:products' %}">Products</a>
+          <a href="{% url 'ecomapp:allproducts' %}">Categories</a>
+          <a href="{% url 'ecomapp:mycart' %}">Cart <span class="cart-count-badge">{{ cart_item_count }}</span></a>
+          <a href="{% url 'ecomapp:favorites' %}">Favorites</a>
+          <a href="{% url 'ecomapp:about' %}">About</a>
+        </div>
+        <div class="nav_actions" id="">
+          <div class="User_option">
+              {% if request.user.is_authenticated %}
+              <a class="text-decoration-none" href="{% url 'ecomapp:customerprofile' %}">{{request.user.username}}</a>
+              {% else %}
+              <a class="text-decoration-none" href="{% url 'ecomapp:customerlogin' %}">Login / Register</a>
+              {% endif %}
+          </div>
+          <div class="custom_menu-btn">
+            <button onclick="openNav()">
+              <img src="/static/images/menu.png" alt="">
+            </button>
+          </div>
+          <div id="myNav" class="overlay">
+            <div class="overlay-content">
+              <a href="{% url 'ecomapp:home' %}">Home</a>
+              <a href="{% url 'ecomapp:about' %}">About</a>
+              <a href="{% url 'ecomapp:products' %}">Products</a>
+              <a href="{% url 'ecomapp:allproducts' %}">Categories</a>
+              <a href="{% url 'ecomapp:mycart' %}">Cart ({{ cart_item_count }})</a>
+              {% if request.user.customer %}
+              <a href="{% url 'ecomapp:customerprofile' %}">My Profile</a>
+              <a href="{% url 'ecomapp:favorites' %}">Favorites</a>
+              <a href="{% url 'ecomapp:customerlogout' %}">Logout</a>
+              {% else %}
+              <a href="{% url 'ecomapp:customerregistration' %}">Register</a>
+              <a href="{% url 'ecomapp:customerlogin' %}">Login</a>
+              {% endif %}
             </div>
           </div>
-        </nav>
-      </div>
-    </header>
-    <section class="slider_section hero_section">
-      <div class="container ">
-        <div class="row">
-          <div class="col-lg-10 mx-auto">
-            <div class="detail-box">
-              <h1>Discover cuisines you'll love</h1>
-              <p>Browse curated menus, trending dishes, and local favorites.</p>
-            </div>
-            <div class="find_container hero_search">
-              <div class="container">
-                <div class="row">
-                  <div class="col">
-                    <form action="{% url 'ecomapp:search' %}" method="get">
-                      <div class="form-row ">
-                        <div class="form-group col-lg-5">
-                          <input type="text" class="form-control" id="inputHotel" placeholder="Search cuisines" name="search" required>
-                        </div>
-                        <div class="form-group col-lg-3">
-                          <div class="btn-box">
-                            <button type="submit" class="btn hero_search-btn">Search</button>
-                          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+  {% if messages %}
+    <div class="toast-region" aria-live="polite" aria-atomic="true">
+      {% for message in messages %}
+        <div class="app-toast app-toast-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <section class="slider_section hero_section">
+    <div class="hero_shell">
+      <div class="hero_panel">
+        <div>
+          <div class="detail-box hero_copy">
+            <span class="hero_eyebrow">Fresh meals delivered fast</span>
+            <h1>Find your next favorite meal.</h1>
+            <p>Search local kitchens, browse best-selling dishes, and get warm food delivered without the clutter.</p>
+          </div>
+          <div class="find_container hero_search">
+            <div class="container">
+              <div class="row">
+                <div class="col">
+                  <form action="{% url 'ecomapp:search' %}" method="get">
+                    <div class="form-row">
+                      <div class="form-group col-md-8">
+                        <input type="text" class="form-control" id="inputHotel" placeholder="Search cuisines" name="search" required>
+                      </div>
+                      <div class="form-group col-md-4">
+                        <div class="btn-box">
+                          <button type="submit" class="btn hero_search-btn">Search</button>
                         </div>
                       </div>
-                    </form>
-                  </div>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>
-            <div class="hero_quick-filters">
-              <span class="hero_quick-label">Popular searches:</span>
-              <div class="hero_quick-links">
-                <a class="hero_filter-link" href="{% url 'ecomapp:search' %}?search=Pizza">Pizza</a>
-                <a class="hero_filter-link" href="{% url 'ecomapp:search' %}?search=Burger">Burgers</a>
-                <a class="hero_filter-link" href="{% url 'ecomapp:search' %}?search=Healthy">Healthy bowls</a>
-                <a class="hero_filter-link" href="{% url 'ecomapp:search' %}?search=Dessert">Desserts</a>
-              </div>
+          </div>
+          <div class="hero_quick-filters">
+            <span class="hero_quick-label">Popular searches:</span>
+            <div class="hero_quick-links">
+              <a class="hero_filter-link" href="{% url 'ecomapp:search' %}?search=Pizza">Pizza</a>
+              <a class="hero_filter-link" href="{% url 'ecomapp:search' %}?search=Burger">Burgers</a>
+              <a class="hero_filter-link" href="{% url 'ecomapp:search' %}?search=Healthy">Healthy bowls</a>
+              <a class="hero_filter-link" href="{% url 'ecomapp:search' %}?search=Dessert">Desserts</a>
             </div>
-            <div class="hero_highlights">
-              <span class="hero_highlight">30-min delivery</span>
-              <span class="hero_highlight">Live order tracking</span>
-              <span class="hero_highlight">Top-rated kitchens</span>
+          </div>
+          <div class="hero_highlights">
+            <span class="hero_highlight">30-min delivery</span>
+            <span class="hero_highlight">Live order tracking</span>
+            <span class="hero_highlight">Top-rated kitchens</span>
+          </div>
+          <div class="hero_cta-row">
+            <a class="hero_cta-btn hero_cta-primary" href="{% url 'ecomapp:products' %}">Browse menu</a>
+            <a class="hero_cta-btn hero_cta-secondary" href="{% url 'ecomapp:mycart' %}">View cart</a>
+          </div>
+          <div class="hero_offer-banner">
+            <div>
+              <p class="hero_offer-title mb-1">Weekend offer: flat 20% off on first order</p>
+              <p class="hero_offer-text mb-0">Use code <strong>WELCOME20</strong> at checkout and enjoy your favorite dishes for less.</p>
             </div>
-            <div class="hero_cta-row">
-              <a class="hero_cta-btn hero_cta-primary" href="{% url 'ecomapp:allproducts' %}">Browse menu</a>
-              <a class="hero_cta-btn hero_cta-secondary" href="{% url 'ecomapp:mycart' %}">View cart</a>
-            </div>
-            <div class="hero_benefits">
-              <div class="hero_benefit-card">
-                <span class="hero_benefit-icon">
-                  <i class="fa fa-cutlery" aria-hidden="true"></i>
-                </span>
+            <a class="hero_offer-cta" href="{% url 'ecomapp:products' %}">Order now</a>
+          </div>
+        </div>
+        <div class="hero_visual" aria-label="Featured dishes">
+          <div class="hero_order-carousel">
+            <article class="hero_order-card hero_order-card-one">
+              <div class="hero_order-top">
                 <div>
-                  <h3>Curated menus</h3>
-                  <p>Chef-picked dishes updated daily.</p>
+                  <span>Chef pick</span>
+                  <strong>Seasonal comfort bowl</strong>
                 </div>
-              </div>
-              <div class="hero_benefit-card">
-                <span class="hero_benefit-icon">
-                  <i class="fa fa-clock-o" aria-hidden="true"></i>
-                </span>
-                <div>
-                  <h3>Smart ETA</h3>
-                  <p>Accurate timing powered by live drivers.</p>
-                </div>
-              </div>
-              <div class="hero_benefit-card">
-                <span class="hero_benefit-icon">
+                <div class="hero_order-rating">
                   <i class="fa fa-star" aria-hidden="true"></i>
-                </span>
+                  4.8
+                </div>
+              </div>
+              <img class="hero_main-dish" src="/static/images/slider-img4.png" alt="Pumpkin soup bowl">
+              <div class="hero_order-meta">
                 <div>
-                  <h3>Top rated</h3>
-                  <p>Only the best-rated kitchens nearby.</p>
+                  <span>Delivery</span>
+                  <strong>30 min</strong>
+                </div>
+                <div>
+                  <span>Starts at</span>
+                  <strong>Rs. 260</strong>
+                </div>
+                <div>
+                  <span>Status</span>
+                  <strong>Hot now</strong>
                 </div>
               </div>
-            </div>
-            <div class="hero_stats">
-              <div class="hero_stat-card">
-                <h4 class="hero_stat-value">500+</h4>
-                <p class="hero_stat-label">Partner restaurants</p>
+            </article>
+            <article class="hero_order-card hero_order-card-two">
+              <div class="hero_order-top">
+                <div>
+                  <span>Trending now</span>
+                  <strong>Loaded harvest bowl</strong>
+                </div>
+                <div class="hero_order-rating">
+                  <i class="fa fa-star" aria-hidden="true"></i>
+                  4.9
+                </div>
               </div>
-              <div class="hero_stat-card">
-                <h4 class="hero_stat-value">4.8/5</h4>
-                <p class="hero_stat-label">Average customer rating</p>
+              <img class="hero_main-dish" src="/static/images/slider-img3.png" alt="Loaded rice bowl">
+              <div class="hero_order-meta">
+                <div>
+                  <span>Delivery</span>
+                  <strong>25 min</strong>
+                </div>
+                <div>
+                  <span>Starts at</span>
+                  <strong>Rs. 320</strong>
+                </div>
+                <div>
+                  <span>Status</span>
+                  <strong>Popular</strong>
+                </div>
               </div>
-              <div class="hero_stat-card">
-                <h4 class="hero_stat-value">25k+</h4>
-                <p class="hero_stat-label">Meals delivered weekly</p>
+            </article>
+            <article class="hero_order-card hero_order-card-three">
+              <div class="hero_order-top">
+                <div>
+                  <span>Light lunch</span>
+                  <strong>Fresh garden salad</strong>
+                </div>
+                <div class="hero_order-rating">
+                  <i class="fa fa-star" aria-hidden="true"></i>
+                  4.7
+                </div>
               </div>
-            </div>
-            <div class="hero_offer-banner">
+              <img class="hero_main-dish" src="/static/images/slider-img2.png" alt="Fresh salad bowl">
+              <div class="hero_order-meta">
+                <div>
+                  <span>Delivery</span>
+                  <strong>20 min</strong>
+                </div>
+                <div>
+                  <span>Starts at</span>
+                  <strong>Rs. 210</strong>
+                </div>
+                <div>
+                  <span>Status</span>
+                  <strong>Fresh</strong>
+                </div>
+              </div>
+            </article>
+          </div>
+          <div class="hero_mini-grid">
+            <div class="hero_mini-card">
+              <img src="/static/images/slider-img1.png" alt="Soup bowl">
               <div>
-                <p class="hero_offer-title mb-1">Weekend offer: flat 20% off on first order</p>
-                <p class="hero_offer-text mb-0">Use code <strong>WELCOME20</strong> at checkout and enjoy your favorite dishes for less.</p>
+                <span>Popular</span>
+                <strong>Soup combos</strong>
               </div>
-              <a class="hero_offer-cta" href="{% url 'ecomapp:allproducts' %}">Order now</a>
+            </div>
+            <div class="hero_mini-card">
+              <img src="/static/images/slider-img3.png" alt="Rice bowl">
+              <div>
+                <span>Fresh today</span>
+                <strong>Loaded bowls</strong>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="slider_container">
-        <div class="item">
-          <div class="img-box">
-            <a href="{% url 'ecomapp:allproducts' %}"> <img src="/static/images/slider-img1.png" alt="" /></a>
-          </div>
-        </div>
-        <div class="item">
-          <div class="img-box">
-            <a href="{% url 'ecomapp:allproducts' %}"><img src="/static/images/slider-img2.png" alt="" /></a>
-          </div>
-        </div>
-        <div class="item">
-          <div class="img-box">
-            <a href="{% url 'ecomapp:allproducts' %}"><img src="/static/images/slider-img3.png" alt="" /></a>
-          </div>
-        </div>
-        <div class="item">
-          <div class="img-box">
-            <a href="{% url 'ecomapp:allproducts' %}"><img src="/static/images/slider-img4.png" alt="" /></a>
-          </div>
-        </div>
-        <div class="item">
-          <div class="img-box">
-            <a href="{% url 'ecomapp:allproducts' %}"><img src="/static/images/slider-img1.png" alt="" /></a>
-          </div>
-        </div>
-        <div class="item">
-          <div class="img-box">
-            <a href="{% url 'ecomapp:allproducts' %}"><img src="/static/images/slider-img2.png" alt="" /></a>
-          </div>
-        </div>
-        <div class="item">
-          <div class="img-box">
-            <a href="{% url 'ecomapp:allproducts' %}"><img src="/static/images/slider-img3.png" alt="" /></a>
-          </div>
-        </div>
-        <div class="item">
-          <div class="img-box">
-            <a href="{% url 'ecomapp:allproducts' %}"><img src="/static/images/slider-img4.png" alt="" /></a>
-          </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="recipe_section layout_padding-top popular_section">
+  <div class="container">
+    <div class="heading_container heading_center">
+      <h2>Popular picks</h2>
+      <p class="section_subtitle">Fast, fresh, and delivered with care.</p>
+    </div>
+    <div class="service_strip">
+      <div class="service_card">
+        <span class="service_icon"><i class="fa fa-bolt" aria-hidden="true"></i></span>
+        <div>
+          <h3>Instant reorder</h3>
+          <p>Repeat your favorites with one tap.</p>
         </div>
       </div>
-    </section>
-    <!-- end slider section -->
-  </div>
-
-
-  <!-- recipe section -->
-
-  <section class="recipe_section layout_padding-top popular_section">
+      <div class="service_card">
+        <span class="service_icon"><i class="fa fa-shield" aria-hidden="true"></i></span>
+        <div>
+          <h3>Secure payments</h3>
+          <p>Protected checkout with multiple wallets.</p>
+        </div>
+      </div>
+      <div class="service_card">
+        <span class="service_icon"><i class="fa fa-cutlery" aria-hidden="true"></i></span>
+        <div>
+          <h3>Diet friendly</h3>
+          <p>Vegan, gluten-free, and keto options.</p>
+        </div>
+      </div>
+    </div>
     <div class="container">
-      <div class="heading_container heading_center">
-        <h2>Popular picks</h2>
-        <p class="section_subtitle">Fast, fresh, and delivered with care.</p>
-      </div>
-      <div class="service_strip">
-        <div class="service_card">
-          <span class="service_icon"><i class="fa fa-bolt" aria-hidden="true"></i></span>
-          <div>
-            <h3>Instant reorder</h3>
-            <p>Repeat your favorites with one tap.</p>
-          </div>
-        </div>
-        <div class="service_card">
-          <span class="service_icon"><i class="fa fa-shield" aria-hidden="true"></i></span>
-          <div>
-            <h3>Secure payments</h3>
-            <p>Protected checkout with multiple wallets.</p>
-          </div>
-        </div>
-        <div class="service_card">
-          <span class="service_icon"><i class="fa fa-cutlery" aria-hidden="true"></i></span>
-          <div>
-            <h3>Diet friendly</h3>
-            <p>Vegan, gluten-free, and keto options.</p>
-          </div>
-        </div>
-      </div>
-      <div class="container">
-        <div class="row mt-3 g-4">
-          {% for p in product_list %}
-          <div class="col-sm-6 col-lg-3">
-            <div class="card product_card h-100">
-              <div class="product_image-wrapper">
-                <a href="{% url 'ecomapp:productdetail' p.slug %}">
-                  <img src="{{ p.image.url }}" alt="{{ p.title }}" class="img-fluid">
-                </a>
-              </div>
-              <div class="card-body d-flex flex-column">
-                <h4 class="product_title text-center">
-                  <a class="text-decoration-none" href="{% url 'ecomapp:productdetail' p.slug %}">{{ p.title }}</a>
-                </h4>
-                <p class="product_price mt-3 text-center">
-                  <span class="text-muted">Rs. <strike>{{ p.marked_price }}</strike></span>
-                  <strong class="text-primary">Rs. {{ p.selling_price }}</strong>
-                </p>
-                <div class="text-center mt-auto">
-                  <a href="{% url 'ecomapp:addtocart' p.id %}" class="btn btn-primary product_cta">Order Now</a>
-                </div>
+      <div class="row mt-3 g-4">
+        {% for p in product_list %}
+        <div class="col-sm-6 col-lg-3">
+          <div class="card product_card h-100">
+            <div class="product_image-wrapper">
+              <a href="{% url 'ecomapp:productdetail' p.slug %}">
+                <img src="{{ p.image.url }}" alt="{{ p.title }}" class="img-fluid">
+              </a>
+            </div>
+            <div class="card-body d-flex flex-column">
+              <h4 class="product_title text-center">
+                <a class="text-decoration-none" href="{% url 'ecomapp:productdetail' p.slug %}">{{ p.title }}</a>
+              </h4>
+              <p class="product_price mt-3 text-center">
+                <span class="text-muted">Rs. <strike>{{ p.marked_price }}</strike></span>
+                <strong class="text-primary">Rs. {{ p.selling_price }}</strong>
+                {% if p.stock > 0 and p.stock <= 5 %}<span class="badge bg-warning">Only {{ p.stock }} left</span>{% endif %}
+              </p>
+              <div class="text-center mt-auto">
+                <form action="{% url 'ecomapp:addtocart' p.id %}" method="post" class="add-to-cart-form" data-ajax="1">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-primary product_cta" data-loading-text="Adding...">Order Now</button>
+                </form>
               </div>
             </div>
           </div>
-          {% endfor %}
         </div>
-        <div class="pagination product_pagination">
-          <span class="step-links">
-            {% if product_list.has_previous %}
-              <a href="?page=1">&laquo; first</a>
-              <a href="?page={{ product_list.previous_page_number }}">previous</a>
-            {% endif %}
-
-            <span class="current">
-              Page {{ product_list.number }} of {{ product_list.paginator.num_pages }}
-            </span>
-            {% if product_list.has_next %}
-              <a href="?page={{ product_list.next_page_number }}">next</a>
-              <a href="?page={{ product_list.paginator.num_pages }}">last &raquo;</a>
-            {% endif %}
+        {% endfor %}
+      </div>
+      <div class="pagination product_pagination">
+        <span class="step-links">
+          {% if product_list.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ product_list.previous_page_number }}">previous</a>
+          {% endif %}
+          <span class="current">
+            Page {{ product_list.number }} of {{ product_list.paginator.num_pages }}
           </span>
+          {% if product_list.has_next %}
+            <a href="?page={{ product_list.next_page_number }}">next</a>
+            <a href="?page={{ product_list.paginator.num_pages }}">last &raquo;</a>
+          {% endif %}
+        </span>
+      </div>
+    </div>
+    <div class="btn-box">
+      <a href="{% url 'ecomapp:allproducts' %}">
+        Order Now
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="steps_section layout_padding">
+  <div class="container">
+    <div class="heading_container heading_center">
+      <h2>How it works</h2>
+      <p class="section_subtitle">A seamless journey from craving to delivery.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="steps_card">
+          <div class="steps_badge">1</div>
+          <h3>Pick your meal</h3>
+          <p>Browse menus, dietary tags, and crowd favorites.</p>
         </div>
       </div>
-      <div class="btn-box">
-        <a href="{% url 'ecomapp:allproducts' %}">
-          Order Now
+      <div class="col-md-4">
+        <div class="steps_card">
+          <div class="steps_badge">2</div>
+          <h3>Customize &amp; pay</h3>
+          <p>Adjust spice levels and pay in seconds.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="steps_card">
+          <div class="steps_badge">3</div>
+          <h3>Track delivery</h3>
+          <p>See your rider in real time until arrival.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="app_section">
+  <div class="container">
+    <div class="col-md-9 mx-auto">
+      <div class="row">
+        <div class="col-md-7 col-lg-8">
+          <div class="detail-box">
+            <h2><span>Get the</span> <br>BhokLagyao App</h2>
+            <p>Order in seconds, track drivers live, and save your favorite meals for repeat cravings.</p>
+            <div class="app_btn_box">
+              <a href="" class="mr-1">
+                <img src="/static/images/google_play.png" class="box-img" alt="">
+              </a>
+              <a href="">
+                <img src="/static/images/app_store.png" class="box-img" alt="">
+              </a>
+            </div>
+            <a href="" class="download_btn">Download Now</a>
+          </div>
+        </div>
+        <div class="col-md-5 col-lg-4">
+          <div class="img-box">
+            <img src="/static/images/mobile.png" class="box-img" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="about_section layout_padding">
+  <div class="container">
+    <div class="col-md-11 col-lg-10 mx-auto">
+      <div class="heading_container heading_center"><h2>About Us</h2></div>
+      <div class="box">
+        <div class="col-md-7 mx-auto">
+          <div class="img-box">
+            <img src="/static/images/about-img.jpg" class="box-img" alt="">
+          </div>
+        </div>
+        <div class="detail-box">
+          <p>We partner with the best local restaurants so you can explore new flavors, rely on fast delivery, and enjoy secure payments.</p>
+          <a href=""><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="news_section">
+  <div class="container">
+    <div class="heading_container heading_center"><h2>Latest News</h2></div>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="box">
+          <div class="img-box"><img src="/static/images/n1.jpg" class="box-img" alt=""></div>
+          <div class="detail-box">
+            <h4>Chef-curated combos</h4>
+            <p>Discover seasonal menus with thoughtfully paired sides and refreshing drinks.</p>
+            <a href=""><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="box">
+          <div class="img-box"><img src="/static/images/n2.jpg" class="box-img" alt=""></div>
+          <div class="detail-box">
+            <h4>Breakfast that travels well</h4>
+            <p>Fuel your morning with warm pastries, artisan coffee, and fresh bowls delivered hot.</p>
+            <a href=""><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="client_section layout_padding">
+  <div class="container">
+    <div class="col-md-11 col-lg-10 mx-auto">
+      <div class="heading_container heading_center"><h2>Testimonial</h2></div>
+      <div id="customCarousel1" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <div class="detail-box">
+              <h4>Virginia</h4>
+              <p>Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and</p>
+              <i class="fa fa-quote-left" aria-hidden="true"></i>
+            </div>
+          </div>
+          <div class="carousel-item">
+            <div class="detail-box">
+              <h4>Virginia</h4>
+              <p>Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and</p>
+              <i class="fa fa-quote-left" aria-hidden="true"></i>
+            </div>
+          </div>
+          <div class="carousel-item">
+            <div class="detail-box">
+              <h4>Virginia</h4>
+              <p>Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and</p>
+              <i class="fa fa-quote-left" aria-hidden="true"></i>
+            </div>
+          </div>
+        </div>
+        <a class="carousel-control-prev d-none" href="#customCarousel1" role="button" data-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#customCarousel1" role="button" data-slide="next">
+          <i class="fa fa-arrow-right" aria-hidden="true"></i>
+          <span class="sr-only">Next</span>
         </a>
       </div>
     </div>
-  </section>
-  <section class="steps_section layout_padding">
-    <div class="container">
-      <div class="heading_container heading_center">
-        <h2>How it works</h2>
-        <p class="section_subtitle">A seamless journey from craving to delivery.</p>
-      </div>
-      <div class="row g-4">
-        <div class="col-md-4">
-          <div class="steps_card">
-            <div class="steps_badge">1</div>
-            <h3>Pick your meal</h3>
-            <p>Browse menus, dietary tags, and crowd favorites.</p>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="steps_card">
-            <div class="steps_badge">2</div>
-            <h3>Customize &amp; pay</h3>
-            <p>Adjust spice levels and pay in seconds.</p>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="steps_card">
-            <div class="steps_badge">3</div>
-            <h3>Track delivery</h3>
-            <p>See your rider in real time until arrival.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <section class="app_section">
-    <div class="container">
-      <div class="col-md-9 mx-auto">
-        <div class="row">
-          <div class="col-md-7 col-lg-8">
-            <div class="detail-box">
-              <h2>
-                <span>Get the</span> <br>
-                BhokLagyao App
-              </h2>
-              <p>
-                Order in seconds, track drivers live, and save your favorite meals for repeat cravings.
-              </p>
-              <div class="app_btn_box">
-                <a href="" class="mr-1">
-                  <img src="/static/images/google_play.png" class="box-img" alt="">
-                </a>
-                <a href="">
-                  <img src="/static/images/app_store.png" class="box-img" alt="">
-                </a>
-              </div>
-              <a href="" class="download_btn">
-                Download Now
-              </a>
-            </div>
-          </div>
-          <div class="col-md-5 col-lg-4">
-            <div class="img-box">
-              <img src="/static/images/mobile.png" class="box-img" alt="">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </section>
-  <section class="about_section layout_padding">
-    <div class="container">
-      <div class="col-md-11 col-lg-10 mx-auto">
-        <div class="heading_container heading_center">
-          <h2>
-            About Us
-          </h2>
-        </div>
-        <div class="box">
-          <div class="col-md-7 mx-auto">
-            <div class="img-box">
-              <img src="/static/images/about-img.jpg" class="box-img" alt="">
-            </div>
-          </div>
-          <div class="detail-box">
-            <p>
-              We partner with the best local restaurants so you can explore new flavors, rely on fast delivery, and enjoy secure payments.
-            </p>
-            <a href="">
-              <i class="fa fa-arrow-right" aria-hidden="true"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <section class="news_section">
-    <div class="container">
-      <div class="heading_container heading_center">
-        <h2>
-          Latest News
-        </h2>
-      </div>
-      <div class="row">
-        <div class="col-md-6">
-          <div class="box">
-            <div class="img-box">
-              <img src="/static/images/n1.jpg" class="box-img" alt="">
-            </div>
-            <div class="detail-box">
-              <h4>
-                Chef-curated combos
-              </h4>
-              <p>
-                Discover seasonal menus with thoughtfully paired sides and refreshing drinks.
-              </p>
-              <a href="">
-                <i class="fa fa-arrow-right" aria-hidden="true"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="box">
-            <div class="img-box">
-              <img src="/static/images/n2.jpg" class="box-img" alt="">
-            </div>
-            <div class="detail-box">
-              <h4>
-                Breakfast that travels well
-              </h4>
-              <p>
-                Fuel your morning with warm pastries, artisan coffee, and fresh bowls delivered hot.
-              </p>
-              <a href="">
-                <i class="fa fa-arrow-right" aria-hidden="true"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <section class="client_section layout_padding">
-    <div class="container">
-      <div class="col-md-11 col-lg-10 mx-auto">
-        <div class="heading_container heading_center">
-          <h2>
-            Testimonial
-          </h2>
-        </div>
-        <div id="customCarousel1" class="carousel slide" data-ride="carousel">
-          <div class="carousel-inner">
-            <div class="carousel-item active">
-              <div class="detail-box">
-                <h4>
-                  Virginia
-                </h4>
-                <p>
-                  Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and
-                </p>
-                <i class="fa fa-quote-left" aria-hidden="true"></i>
-              </div>
-            </div>
-            <div class="carousel-item">
-              <div class="detail-box">
-                <h4>
-                  Virginia
-                </h4>
-                <p>
-                  Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and
-                </p>
-                <i class="fa fa-quote-left" aria-hidden="true"></i>
-              </div>
-            </div>
-            <div class="carousel-item">
-              <div class="detail-box">
-                <h4>
-                  Virginia
-                </h4>
-                <p>
-                  Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and
-                </p>
-                <i class="fa fa-quote-left" aria-hidden="true"></i>
-              </div>
-            </div>
-          </div>
-          <a class="carousel-control-prev d-none" href="#customCarousel1" role="button" data-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="sr-only">Previous</span>
-          </a>
-          <a class="carousel-control-next" href="#customCarousel1" role="button" data-slide="next">
-            <i class="fa fa-arrow-right" aria-hidden="true"></i>
-            <span class="sr-only">Next</span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-  <div class="footer_container">
-    <section class="info_section ">
-      <div class="container">
-        <div class="contact_box">
-          <a href="">
-            <i class="fa fa-map-marker" aria-hidden="true"></i>
-          </a>
-          <a href="">
-            <i class="fa fa-phone" aria-hidden="true"></i>
-          </a>
-          <a href="">
-            <i class="fa fa-envelope" aria-hidden="true"></i>
-          </a>
-        </div>
-        <div class="info_links">
-          <ul>
-            <li class="active">
-              <a href="index.html">
-                Home
-              </a>
-            </li>
-            <li>
-              <a href="about.html">
-                About
-              </a>
-            </li>
-            <li>
-              <a class="" href="blog.html">
-                Blog
-              </a>
-            </li>
-            <li>
-              <a class="" href="testimonial.html">
-                Testimonial
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div class="social_box">
-          <a href="">
-            <i class="fa fa-facebook" aria-hidden="true"></i>
-          </a>
-          <a href="">
-            <i class="fa fa-twitter" aria-hidden="true"></i>
-          </a>
-          <a href="">
-            <i class="fa fa-linkedin" aria-hidden="true"></i>
-          </a>
-        </div>
-      </div>
-    </section>
-    <footer class="footer_section">
-      <div class="container">
-        <p>
-          &copy; <span id="displayYear"></span> All Rights Reserved By
-          <a href="">BhokLagyao</a><br>
-        </p>
-      </div>
-    </footer>
   </div>
+</section>
+{% endblock %}
 
-  <script src="/static/js/jquery-3.4.1.min.js"></script>
+{% block footer %}
+<div class="footer_container">
+  <section class="info_section">
+    <div class="container">
+      <div class="contact_box">
+        <a href=""><i class="fa fa-map-marker" aria-hidden="true"></i></a>
+        <a href=""><i class="fa fa-phone" aria-hidden="true"></i></a>
+        <a href=""><i class="fa fa-envelope" aria-hidden="true"></i></a>
+      </div>
+      <div class="info_links">
+        <ul>
+          <li><a href="{% url 'ecomapp:home' %}">Home</a></li>
+          <li><a href="{% url 'ecomapp:about' %}">About</a></li>
+          <li><a href="{% url 'ecomapp:products' %}">Products</a></li>
+          <li><a href="{% url 'ecomapp:contact' %}">Contact</a></li>
+        </ul>
+      </div>
+      <div class="social_box">
+        <a href=""><i class="fa fa-facebook" aria-hidden="true"></i></a>
+        <a href=""><i class="fa fa-twitter" aria-hidden="true"></i></a>
+        <a href=""><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+      </div>
+    </div>
+  </section>
+  <footer class="footer_section">
+    <div class="container">
+      <p>&copy; <span id="displayYear"></span> All Rights Reserved By <a href="">BhokLagyao</a><br></p>
+    </div>
+  </footer>
+</div>
+{% endblock %}
 
-  <script src="/static/js/bootstrap.js"></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.js"></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js" integrity="sha256-Zr3vByTlMGQhvMfgkQ5BtWRSKBGa2QlspKYJnkjZTmo=" crossorigin="anonymous"></script>
-
-  <script src="/static/js/custom.js"></script>
-</body>
-</html>
+{% block extra_js %}
+<script src="/static/js/jquery-3.4.1.min.js"></script>
+<script src="/static/js/bootstrap.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js" integrity="sha256-Zr3vByTlMGQhvMfgkQ5BtWRSKBGa2QlspKYJnkjZTmo=" crossorigin="anonymous"></script>
+<script src="/static/js/custom.js"></script>
+{% endblock %}

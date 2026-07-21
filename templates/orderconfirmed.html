@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Order Confirmed{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Order confirmed</span>
+      <h1 class="page-title mb-0">ORDER_{{ order.id }} is placed</h1>
+      <p class="page-lede">We have received your order and will start preparing it shortly.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'ecomapp:trackorder' order.id %}">Track Order</a>
+  </header>
+
+  <div class="checkout-layout">
+    <section class="surface-card">
+      <h2 class="h5 fw-bold mb-3">Order Summary</h2>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Qty</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cp in order.cart.cartproduct_set.all %}
+              <tr>
+                <td class="fw-bold">{{ cp.product.title }}</td>
+                <td>{{ cp.quantity }}</td>
+                <td>Rs. {{ cp.subtotal }}</td>
+              </tr>
+            {% endfor %}
+            <tr>
+              <th colspan="2" class="text-end">Total paid/payable</th>
+              <th>Rs. {{ order.total }}</th>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <aside class="surface-card">
+      <h2 class="h5 fw-bold mb-3">Delivery</h2>
+      <dl class="detail-list">
+        <div><dt>Status</dt><dd>{{ order.order_status }}</dd></div>
+        <div><dt>Payment</dt><dd>{{ order.payment_method }}{% if order.payment_completed %} - Paid{% endif %}</dd></div>
+        <div><dt>Receiver</dt><dd>{{ order.ordered_by }}</dd></div>
+        <div><dt>Mobile</dt><dd>{{ order.mobile }}</dd></div>
+        <div><dt>Address</dt><dd>{{ order.shipping_address }}</dd></div>
+        <div><dt>Zone</dt><dd>{{ order.delivery_zone|default:"Standard" }}</dd></div>
+        <div><dt>Delivery Fee</dt><dd>{% if order.delivery_fee %}Rs. {{ order.delivery_fee }}{% else %}Free{% endif %}</dd></div>
+      </dl>
+    </aside>
+  </div>
+</div>
+{% endblock %}

@@ -2,37 +2,40 @@
 {% block title %}Search{% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="mb-4">
-    <h1 class="page-title mb-1">Search Results</h1>
-    <p class="text-muted mb-0">Showing cuisines for "{{ request.GET.search }}"</p>
-  </div>
+<div class="page-shell">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Search</span>
+      <h1 class="page-title mb-0">Results for "{{ request.GET.search }}"</h1>
+      <p class="page-lede">Find dishes by cuisine, name, or ingredient and order directly from the results.</p>
+    </div>
+  </header>
 
-  <div class="row g-4">
+  <div class="product-grid">
     {% for result in results %}
-      <div class="col-12">
-        <article class="card border-0 p-3 p-md-4">
-          <div class="row g-3 align-items-center">
-            <div class="col-md-4">
-              <img src="{{ result.image.url }}" class="img-fluid rounded-4 search-image" alt="{{ result.title }}">
-            </div>
-            <div class="col-md-8">
-              <h2 class="h4 mb-2"><a href="{% url 'ecomapp:productdetail' result.slug %}" class="text-decoration-none">{{ result.title }}</a></h2>
-              <p class="text-muted mb-3">{{ result.description|truncatechars:170 }}</p>
-              <p class="product_price mb-3">
-                <small class="text-muted text-decoration-line-through me-2">Rs. {{ result.marked_price }}</small>
-                <strong>Rs. {{ result.selling_price }}</strong>
-              </p>
-              <a href="{% url 'ecomapp:addtocart' result.id %}" class="btn btn-primary">Add to Cart</a>
-            </div>
-          </div>
-        </article>
-      </div>
-    {% empty %}
-      <div class="col-12">
-        <div class="card border-0 p-4 text-center">
-          <p class="text-muted mb-0">No matching cuisines found. Try another keyword.</p>
+      <article class="product_card">
+        <a class="product_image-wrapper" href="{% url 'ecomapp:productdetail' result.slug %}">
+          <img src="{{ result.image.url }}" alt="{{ result.title }}">
+        </a>
+        <div class="product_card-body">
+          <p class="product_meta mb-1">{{ result.category.title }}</p>
+          <h2 class="product_title h5 mb-2"><a href="{% url 'ecomapp:productdetail' result.slug %}" class="text-decoration-none">{{ result.title }}</a></h2>
+          <p class="product_desc mb-3">{{ result.description|truncatechars:100 }}</p>
+          <p class="product_price mb-3 mt-auto">
+            <small class="text-muted text-decoration-line-through me-2">Rs. {{ result.marked_price }}</small>
+            <strong>Rs. {{ result.selling_price }}</strong>
+          </p>
+          <form action="{% url 'ecomapp:addtocart' result.id %}" method="post" class="add-to-cart-form" data-ajax="1">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary w-100" data-loading-text="Adding...">Add to Cart</button>
+          </form>
         </div>
+      </article>
+    {% empty %}
+      <div class="empty-state">
+        <h2>No matching dishes found</h2>
+        <p>Try a different keyword or browse the full menu.</p>
+        <a class="btn btn-primary" href="{% url 'ecomapp:products' %}">Browse Products</a>
       </div>
     {% endfor %}
   </div>

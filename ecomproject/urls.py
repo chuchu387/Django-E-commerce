@@ -25,3 +25,8 @@ urlpatterns = [
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler400 = "ecomapp.views.handler400"
+handler403 = "ecomapp.views.handler403"
+handler404 = "ecomapp.views.handler404"
+handler500 = "ecomapp.views.handler500"

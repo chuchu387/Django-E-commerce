@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}All Products{% endblock %}
+{% block meta_description %}Browse all BhokLagyao dishes with search, category filters, price sorting, and fast cart checkout.{% endblock %}
+{% block og_title %}BhokLagyao Products{% endblock %}
+{% block og_description %}Explore fresh meals, beverages, desserts, breakfast, and dinner options from BhokLagyao.{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">All products</span>
+      <h1 class="page-title mb-0">Every dish in one place</h1>
+      <p class="page-lede">Scroll through the full catalog without switching categories. Images are shown in their natural framing.</p>
+    </div>
+    <a class="btn btn-outline-primary" href="{% url 'ecomapp:allproducts' %}">Browse by Category</a>
+  </header>
+
+  <form class="catalog-filter surface-card" method="get">
+    <div class="filter-field filter-field-search">
+      <label for="catalog-q">Search</label>
+      <input id="catalog-q" type="search" name="q" value="{{ active_query }}" placeholder="Search dishes, category, ingredients">
+    </div>
+    <div class="filter-field">
+      <label for="catalog-category">Category</label>
+      <select id="catalog-category" name="category">
+        <option value="">All categories</option>
+        {% for category in categories %}
+          <option value="{{ category.slug }}" {% if active_category and active_category == category.slug %}selected{% endif %}>{{ category.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% if vendors %}
+    <div class="filter-field">
+      <label for="catalog-vendor">Kitchen</label>
+      <select id="catalog-vendor" name="vendor">
+        <option value="">All kitchens</option>
+        {% for v in vendors %}
+          <option value="{{ v.slug }}" {% if active_vendor == v.slug %}selected{% endif %}>{{ v.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+    <div class="filter-field">
+      <label for="catalog-sort">Sort</label>
+      <select id="catalog-sort" name="sort">
+        <option value="popular" {% if active_sort == "popular" %}selected{% endif %}>Most viewed</option>
+        <option value="new" {% if active_sort == "new" %}selected{% endif %}>Newest</option>
+        <option value="price-low" {% if active_sort == "price-low" %}selected{% endif %}>Price: low to high</option>
+        <option value="price-high" {% if active_sort == "price-high" %}selected{% endif %}>Price: high to low</option>
+      </select>
+    </div>
+    <div class="filter-actions">
+      <button class="btn btn-primary" type="submit">Apply</button>
+      <a class="btn btn-outline-primary" href="{% url 'ecomapp:products' %}">Reset</a>
+    </div>
+  </form>
+
+  <div class="compact-product-grid">
+    {% for p in products %}
+      <article class="product_card compact-product-card">
+        <a class="product_image-wrapper" href="{% url 'ecomapp:productdetail' p.slug %}">
+          <img src="{{ p.image.url }}" alt="{{ p.title }}">
+        </a>
+        <div class="product_card-body">
+          <p class="product_meta mb-1">{{ p.category.title }}</p>
+          <h2 class="product_title h6 mb-2">
+            <a class="text-decoration-none" href="{% url 'ecomapp:productdetail' p.slug %}">{{ p.title }}</a>
+          </h2>
+          <p class="product_price mb-3 mt-auto">
+            <small class="text-muted text-decoration-line-through me-2">Rs. {{ p.marked_price }}</small>
+            <strong>Rs. {{ p.selling_price }}</strong>
+            {% if not p.is_available %}<span class="badge bg-danger ms-1">Sold Out</span>{% endif %}
+          </p>
+          {% if p.is_available_for_purchase %}
+          <form action="{% url 'ecomapp:addtocart' p.id %}" method="post" class="add-to-cart-form" data-ajax="1">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary product_cta w-100" data-loading-text="Adding...">Add</button>
+          </form>
+          {% else %}
+          <button class="btn btn-secondary w-100" disabled>Sold Out</button>
+          {% endif %}
+        </div>
+      </article>
+    {% empty %}
+      <div class="empty-state">
+        <h2>No products available yet</h2>
+        <p>The menu is being prepared. Please check back shortly.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

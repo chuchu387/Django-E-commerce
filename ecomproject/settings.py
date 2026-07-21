@@ -35,9 +35,22 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+# Security hardening (set these in .env for production)
+if not DEBUG:
+    SECURE_SSL_REDIRECT = os.getenv('DJANGO_SECURE_SSL', 'True').lower() in {'1', 'true'}
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = int(os.getenv('DJANGO_HSTS_SECONDS', 31536000))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    X_FRAME_OPTIONS = 'DENY'
+
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -71,6 +84,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'ecomapp.context_processors.cart_summary',
             ],
         },
     },
@@ -120,6 +134,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
+BASE_URL = os.getenv('DJANGO_BASE_URL', 'http://localhost:8000')
+
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'static_cdn'
@@ -127,12 +143,118 @@ STATIC_ROOT = BASE_DIR / 'static_cdn'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Default primary key field type
+# Cache — swap to memcached in production (requires memcached daemon + pymemcache)
+#   CACHES = {
+#       'default': {
+#           'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+#           'LOCATION': '127.0.0.1:11211',
+#       }
+#   }
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'bhoklagyao-cache',
+    }
+}
+
+# Session engine (use cached sessions for performance)
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_USE_TLS = True
+
+# Brevo (Sendinblue) SMTP
+EMAIL_HOST = 'smtp-relay.brevo.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "yourmail@gmail.com")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "yourpassword")
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'support.codastralabs@gmail.com'
+EMAIL_HOST_PASSWORD = os.getenv('BREVO_SMTP_KEY', '')
+DEFAULT_FROM_EMAIL = 'BhokLagyao <support.codastralabs@gmail.com>'
+BREVO_API_KEY = os.getenv('BREVO_API_KEY', '')
+
+# Jazzmin Admin UI Configuration
+JAZZMIN_SETTINGS = {
+    "site_title": "BhokLagyao Admin",
+    "site_header": "BhokLagyao",
+    "site_brand": "BhokLagyao",
+    "site_logo": "/static/images/bhoklagyao-logo.svg",
+    "login_logo": None,
+    "login_logo_dark": None,
+    "site_logo_classes": "img-circle",
+    "site_icon": "/static/images/bhoklagyao-logo.svg",
+    "welcome_sign": "Welcome to BhokLagyao Admin",
+    "copyright": "BhokLagyao",
+    "search_model": ["auth.User", "ecomapp.Order", "ecomapp.Product"],
+    "user_avatar": None,
+    "topmenu_links": [
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "View Site", "url": "/", "new_window": True},
+    ],
+    "usermenu_links": [
+        {"name": "View Site", "url": "/", "new_window": True},
+    ],
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+    "order_with_respect_to": ["auth", "ecomapp"],
+    "custom_links": {},
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "ecomapp.Admin": "fas fa-user-tie",
+        "ecomapp.Customer": "fas fa-user",
+        "ecomapp.Category": "fas fa-tags",
+        "ecomapp.Product": "fas fa-utensils",
+        "ecomapp.ProductImage": "fas fa-images",
+        "ecomapp.Cart": "fas fa-shopping-cart",
+        "ecomapp.CartProduct": "fas fa-box",
+        "ecomapp.Order": "fas fa-receipt",
+        "ecomapp.DeliveryZone": "fas fa-truck",
+        "ecomapp.Coupon": "fas fa-percent",
+        "ecomapp.Favorite": "fas fa-heart",
+    },
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+    "related_modal_active": True,
+    "custom_css": None,
+    "custom_js": None,
+    "use_google_fonts_cdn": True,
+    "show_ui_builder": False,
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {"auth.user": "collapsible", "auth.Group": "vertical_tabs"},
+    "language_chooser": False,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": False,
+    "accent": "accent-primary",
+    "navbar": "navbar-dark navbar-navy",
+    "no_navbar_border": False,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-navy",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": True,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": "darkly",
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success",
+    },
+}

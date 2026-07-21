@@ -1,0 +1,55 @@
+{% extends 'vendor_base.html' %}
+{% block title %}{% if product %}Edit Product{% else %}Add Product{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-shell-narrow">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Kitchen Portal</span>
+      <h1 class="page-title mb-0">{% if product %}Edit Product{% else %}Add Product{% endif %}</h1>
+      <a href="{% url 'ecomapp:vendorproducts' %}" class="btn btn-outline-primary btn-sm mt-2">&larr; Back to products</a>
+    </div>
+  </header>
+
+  <div class="surface-card p-4 mb-4">
+    <form action="" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% include "includes/form_fields.html" %}
+      <button type="submit" class="btn btn-primary w-100 mt-3">
+        {% if product %}Update Product{% else %}Add Product{% endif %}
+      </button>
+    </form>
+  </div>
+
+  {% if product %}
+  <div class="surface-card p-4">
+    <h2 class="h5 fw-bold mb-3">Product Images</h2>
+
+    {% with images=product.productimage_set.all %}
+      {% if images %}
+      <div class="row g-3 mb-4" id="image-gallery">
+        {% for img in images %}
+        <div class="col-4 col-md-3" id="img-{{ img.id }}">
+          <div class="position-relative">
+            <img src="{{ img.image.url }}" class="img-fluid rounded" style="height:120px;width:100%;object-fit:cover;">
+            <form action="{% url 'ecomapp:vendorproductimagedelete' img.id %}" method="post" class="position-absolute top-0 end-0 m-1">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-danger rounded-circle" style="width:28px;height:28px;padding:0;font-size:14px;line-height:28px;" onclick="return confirm('Delete this image?')">&times;</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+
+    <h3 class="h6 fw-bold mb-2">Add Images</h3>
+    <form action="{% url 'ecomapp:vendorproductimageadd' product.id %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="file" name="images" multiple accept="image/*" class="form-control mb-2">
+      <button type="submit" class="btn btn-outline-primary btn-sm">Upload</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

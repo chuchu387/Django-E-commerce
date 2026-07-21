@@ -1,34 +1,323 @@
 {% extends "adminpages/adminbase.html" %}
-{% block title %}Admin Home{% endblock %}
+{% load humanize %}
+{% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <h3>Prnding Orders</h3>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>SN</th>
-                        <th>Customer</th>
-                        <th>Order ID</th>
-                        <th>Ordered On</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in pendingorders %}
-                    <tr>
-                        <td>{{forloop.counter}}</td>
-                        <td><a href="{% url 'ecomapp:adminorderdetail' order.id %}">ORDER_{{order.id}}</a> </td>
-                        <td>{{order.ordered_by}}</td>
-                        <td>{{order.created_at}}</td>
-                        <td>{{order.total}}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">Admin Dashboard</h3>
+    <span class="text-muted">{{ today|date:"l, M d, Y" }}</span>
+  </div>
+
+  <!-- Row 1: Key Metrics -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="display-6 text-success">Rs.</div>
+          <div>
+            <h6 class="text-muted text-uppercase small mb-1">Total Revenue</h6>
+            <h3 class="mb-0 fw-bold">Rs. {{ total_revenue|intcomma }}</h3>
+            <small class="text-muted">Avg order: Rs. {{ avg_order_value|floatformat:0|intcomma }}</small>
+          </div>
         </div>
+      </div>
     </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="display-6 text-primary">📦</div>
+          <div>
+            <h6 class="text-muted text-uppercase small mb-1">Total Orders</h6>
+            <h3 class="mb-0 fw-bold">{{ total_orders }}</h3>
+            <small class="text-muted">{{ todays_count }} today</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="display-6 text-warning">⏳</div>
+          <div>
+            <h6 class="text-muted text-uppercase small mb-1">Pending Orders</h6>
+            <h3 class="mb-0 fw-bold text-warning">{{ pending_count }}</h3>
+            <small class="text-muted">{{ processing_count }} processing</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="display-6 text-info">👥</div>
+          <div>
+            <h6 class="text-muted text-uppercase small mb-1">Customers</h6>
+            <h3 class="mb-0 fw-bold">{{ total_customers }}</h3>
+            <small class="text-muted">{{ total_vendors }} vendors</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Secondary Metrics -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-2">
+      <div class="card border-0 shadow-sm text-center py-3 h-100">
+        <div class="card-body py-2">
+          <h6 class="text-muted text-uppercase small mb-1">Today's Revenue</h6>
+          <h4 class="mb-0 fw-bold text-success">Rs. {{ todays_revenue|intcomma }}</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card border-0 shadow-sm text-center py-3 h-100">
+        <div class="card-body py-2">
+          <h6 class="text-muted text-uppercase small mb-1">Pending Vendors</h6>
+          <h4 class="mb-0 fw-bold {% if pending_vendors %}text-warning{% else %}text-muted{% endif %}">{{ pending_vendors }}</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card border-0 shadow-sm text-center py-3 h-100">
+        <div class="card-body py-2">
+          <h6 class="text-muted text-uppercase small mb-1">Pending Products</h6>
+          <h4 class="mb-0 fw-bold {% if pending_products %}text-warning{% else %}text-muted{% endif %}">{{ pending_products }}</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card border-0 shadow-sm text-center py-3 h-100">
+        <div class="card-body py-2">
+          <h6 class="text-muted text-uppercase small mb-1">Low Stock</h6>
+          <h4 class="mb-0 fw-bold {% if low_stock_products %}text-warning{% else %}text-muted{% endif %}">{{ low_stock_products }}</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card border-0 shadow-sm text-center py-3 h-100">
+        <div class="card-body py-2">
+          <h6 class="text-muted text-uppercase small mb-1">Out of Stock</h6>
+          <h4 class="mb-0 fw-bold {% if out_of_stock %}text-danger{% else %}text-muted{% endif %}">{{ out_of_stock }}</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card border-0 shadow-sm text-center py-3 h-100">
+        <div class="card-body py-2">
+          <h6 class="text-muted text-uppercase small mb-1">Avg Order</h6>
+          <h4 class="mb-0 fw-bold">Rs. {{ avg_order_value|floatformat:0|intcomma }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3: Charts -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Revenue (Last 7 Days)</h5>
+        </div>
+        <div class="card-body">
+          <canvas id="revenueChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Orders by Status</h5>
+        </div>
+        <div class="card-body">
+          <canvas id="statusChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 4: Tables -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Best Selling Items</h5>
+        </div>
+        <div class="card-body p-0">
+          <table class="table mb-0">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Product</th>
+                <th>Units Sold</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in best_sellers %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.product__title }}</td>
+                <td><span class="badge bg-primary rounded-pill">{{ item.total_qty }}</span></td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="3" class="text-muted text-center py-3">No sales yet</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Top Vendors by Revenue</h5>
+        </div>
+        <div class="card-body p-0">
+          <table class="table mb-0">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Vendor</th>
+                <th>Revenue</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for v in top_vendors %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ v.name }}</td>
+                <td>Rs. {{ v.revenue|floatformat:0|intcomma }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="3" class="text-muted text-center py-3">No vendor revenue yet</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 5: Quick Actions + Recent Orders -->
+  <div class="row g-3">
+    <div class="col-md-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <h5 class="mb-0">Recent Orders</h5>
+          <div class="d-flex gap-2">
+            <span class="badge bg-warning fs-6">{{ pending_count }} pending</span>
+            <a href="{% url 'ecomapp:adminorderlist' %}" class="btn btn-sm btn-outline-primary">View All</a>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table mb-0">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Customer</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Zone</th>
+                  <th>Date</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in recent_orders %}
+                <tr class="{% if order.order_status == 'Order Received' %}table-warning{% endif %}">
+                  <td><a href="{% url 'ecomapp:adminorderdetail' order.id %}" class="fw-bold">ORDER_{{ order.id }}</a></td>
+                  <td>{{ order.ordered_by }}</td>
+                  <td>Rs. {{ order.total|intcomma }}</td>
+                  <td>
+                    <span class="badge bg-{% if order.order_status == 'Order Completed' %}success{% elif order.order_status == 'Order Cancelled' %}danger{% elif order.order_status == 'Order Received' %}warning{% else %}info{% endif %}">
+                      {{ order.order_status }}
+                    </span>
+                  </td>
+                  <td><small>{{ order.delivery_zone|default:"—" }}</small></td>
+                  <td><small>{{ order.created_at|timesince }} ago</small></td>
+                  <td><a href="{% url 'ecomapp:adminorderdetail' order.id %}" class="btn btn-sm btn-outline-secondary">View</a></td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="7" class="text-muted text-center py-3">No orders yet</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<script>
+var chartData = {{ chart_data|safe }};
+var labels = chartData.map(function(d) { return d.date; });
+var revenues = chartData.map(function(d) { return d.revenue; });
+var orders = chartData.map(function(d) { return d.orders; });
+
+new Chart(document.getElementById('revenueChart'), {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [{
+      label: 'Revenue (Rs.)',
+      data: revenues,
+      backgroundColor: 'rgba(40, 167, 69, 0.15)',
+      borderColor: '#28a745',
+      borderWidth: 2,
+      borderRadius: 6,
+      yAxisID: 'y',
+    }, {
+      label: 'Orders',
+      data: orders,
+      type: 'line',
+      borderColor: '#007bff',
+      backgroundColor: 'rgba(0, 123, 255, 0.05)',
+      borderWidth: 2,
+      tension: 0.3,
+      pointRadius: 4,
+      pointBackgroundColor: '#007bff',
+      yAxisID: 'y1',
+    }]
+  },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      y: { beginAtZero: true, title: { display: true, text: 'Revenue (Rs.)' } },
+      y1: { position: 'right', beginAtZero: true, title: { display: true, text: 'Orders' }, grid: { display: false } },
+    }
+  }
+});
+
+var statusData = {{ orders_by_status_json|safe }};
+var statusLabels = Object.keys(statusData);
+var statusValues = statusLabels.map(function(k) { return statusData[k]; });
+var statusColors = { 'Order Received': '#ffc107', 'Order Processing': '#17a2b8', 'On the way': '#007bff', 'Order Completed': '#28a745', 'Order Cancelled': '#dc3545' };
+var bgColors = statusLabels.map(function(k) { return statusColors[k] || '#6c757d'; });
+
+new Chart(document.getElementById('statusChart'), {
+  type: 'doughnut',
+  data: {
+    labels: statusLabels,
+    datasets: [{ data: statusValues, backgroundColor: bgColors, borderWidth: 0 }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } } }
+  }
+});
+</script>
 {% endblock %}

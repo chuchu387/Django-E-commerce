@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}{% if address %}Edit Address{% else %}Add Address{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-shell-narrow">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Address</span>
+      <h1 class="page-title mb-0">{% if address %}Edit Address{% else %}Add New Address{% endif %}</h1>
+      <a href="{% url 'ecomapp:addresses' %}" class="btn btn-outline-primary btn-sm mt-2">&larr; Back to addresses</a>
+    </div>
+  </header>
+
+  <div class="surface-card p-4">
+    <form action="" method="post">
+      {% csrf_token %}
+      {% include "includes/form_fields.html" %}
+      <button type="submit" class="btn btn-primary w-100 mt-3">
+        {% if address %}Update Address{% else %}Save Address{% endif %}
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

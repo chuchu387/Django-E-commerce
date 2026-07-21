@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}My Addresses{% endblock %}
+
+{% block extra_head %}
+<style>
+.address-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+.address-card { padding: 1.25rem; border: 1px solid #e0e0e0; border-radius: 8px; }
+.address-default { border-color: #28a745; box-shadow: 0 0 0 2px rgba(40,167,69,0.15); }
+.page-shell-narrow { max-width: 600px; margin: 0 auto; padding: 2rem 1rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Account</span>
+      <h1 class="page-title mb-0">My Addresses</h1>
+      <p class="page-lede">Manage your saved delivery addresses.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'ecomapp:addresscreate' %}">Add New Address</a>
+  </header>
+
+  <div class="address-grid">
+    {% for addr in addresses %}
+      <div class="surface-card address-card {% if addr.is_default %}address-default{% endif %}">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="badge bg-secondary">{{ addr.label }}</span>
+          {% if addr.is_default %}
+            <span class="badge bg-success">Default</span>
+          {% endif %}
+        </div>
+        <strong>{{ addr.full_name }}</strong><br>
+        <span class="text-muted small">{{ addr.mobile }}</span><br>
+        {{ addr.street_address }}<br>
+        {{ addr.city }}{% if addr.postal_code %}, {{ addr.postal_code }}{% endif %}<br>
+        {% if addr.delivery_zone %}
+          <span class="badge bg-info mt-1">{{ addr.delivery_zone.name }}</span>
+        {% endif %}
+        <div class="mt-3 d-flex gap-2">
+          <a href="{% url 'ecomapp:addressedit' addr.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
+          <form action="{% url 'ecomapp:addressdelete' addr.pk %}" method="post" class="d-inline" onsubmit="return confirm('Delete this address?')">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+          </form>
+          {% if not addr.is_default %}
+            <button class="btn btn-outline-secondary btn-sm set-default" data-url="{% url 'ecomapp:addresssetdefault' addr.pk %}">Set Default</button>
+          {% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <div class="surface-card p-4 text-center empty-state">
+        <h2>No saved addresses</h2>
+        <p>Add a delivery address to speed up future checkouts.</p>
+        <a class="btn btn-primary" href="{% url 'ecomapp:addresscreate' %}">Add Address</a>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCSRF() {
+  var m = document.cookie.match(/csrftoken=([^;]+)/);
+  return m ? m[1] : '';
+}
+document.querySelectorAll('.set-default').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    fetch(this.dataset.url, { method: 'POST', headers: { 'X-CSRFToken': getCSRF() } })
+      .then(function(r) { return r.json(); })
+      .then(function(d) { if (d.success) location.reload(); });
+  });
+});
+</script>
+{% endblock %}

@@ -1,6 +1,39 @@
 {% extends 'base.html' %}
-{% block title %}Contact Us{% endblock %}
+{% block title %}Contact BhokLagyao{% endblock %}
+
 {% block content %}
-<h1>Contact Page</h1>
-<p>this is conact page</p>
+<div class="page-shell">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Contact</span>
+      <h1 class="page-title mb-0">We are here to help.</h1>
+      <p class="page-lede">Reach out for order support, restaurant partnerships, menu questions, or launch feedback.</p>
+    </div>
+  </header>
+
+  <div class="about-grid">
+    <section class="surface-card">
+      <h2 class="h4 fw-bold mb-3">Support channels</h2>
+      <dl class="detail-list">
+        <div>
+          <dt>Email</dt>
+          <dd>support@bhoklagyao.local</dd>
+        </div>
+        <div>
+          <dt>Phone</dt>
+          <dd>+977 9800000000</dd>
+        </div>
+        <div>
+          <dt>Service Area</dt>
+          <dd>Kathmandu Valley</dd>
+        </div>
+      </dl>
+    </section>
+    <aside class="surface-card">
+      <h2 class="h4 fw-bold mb-3">Partner with us</h2>
+      <p class="text-muted">Restaurants and cloud kitchens can join BhokLagyao to reach customers with a clean catalog, cart, and checkout flow.</p>
+      <a class="btn btn-primary" href="{% url 'ecomapp:products' %}">View Customer Menu</a>
+    </aside>
+  </div>
+</div>
 {% endblock %}

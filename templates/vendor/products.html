@@ -1,0 +1,70 @@
+{% extends 'vendor_base.html' %}
+{% block title %}My Products{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Kitchen Portal</span>
+      <h1 class="page-title mb-0">My Products</h1>
+      <p class="page-lede">Manage your inventory. New products need admin approval.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'ecomapp:vendorproductadd' %}">Add Product</a>
+  </header>
+
+  <div class="table-responsive surface-card p-3">
+    <table class="table align-middle mb-0 vendor-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Status</th>
+          <th>Approval</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+        <tr>
+          <td>
+            <a href="{% url 'ecomapp:productdetail' p.slug %}">{{ p.title }}</a>
+          </td>
+          <td>Rs. {{ p.selling_price }}</td>
+          <td>
+            {% if p.stock == 0 %}
+              <span class="badge bg-danger">Out of stock</span>
+            {% elif p.stock <= p.low_stock_threshold %}
+              <span class="badge bg-warning text-dark">{{ p.stock }} left</span>
+            {% else %}
+              {{ p.stock }}
+            {% endif %}
+          </td>
+          <td>
+            {% if p.is_hidden %}
+              <span class="badge bg-secondary">Hidden</span>
+            {% elif p.is_available %}
+              <span class="badge bg-success">Active</span>
+            {% else %}
+              <span class="badge bg-secondary">Disabled</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if p.is_approved %}
+              <span class="badge bg-success">Approved</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">Pending</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'ecomapp:vendorproductedit' p.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6"><div class="empty-state"><h2>No products yet</h2><a href="{% url 'ecomapp:vendorproductadd' %}">Add your first product</a></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

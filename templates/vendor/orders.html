@@ -1,0 +1,63 @@
+{% extends 'vendor_base.html' %}
+{% block title %}My Orders{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Kitchen Portal</span>
+      <h1 class="page-title mb-0">Incoming Orders</h1>
+      <p class="page-lede">Track and update order statuses in real time.</p>
+    </div>
+  </header>
+
+  <!-- Filter tabs -->
+  <div class="d-flex gap-2 flex-wrap mb-3">
+    <a href="{% url 'ecomapp:vendororders' %}" class="btn btn-sm {% if not request.GET.status %}btn-primary{% else %}btn-outline-secondary{% endif %}">All</a>
+    <a href="{% url 'ecomapp:vendororders' %}?status=Order+Received" class="btn btn-sm {% if request.GET.status == 'Order Received' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Pending</a>
+    <a href="{% url 'ecomapp:vendororders' %}?status=Preparing" class="btn btn-sm {% if request.GET.status == 'Preparing' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Preparing</a>
+    <a href="{% url 'ecomapp:vendororders' %}?status=On+the+way" class="btn btn-sm {% if request.GET.status == 'On the way' %}btn-primary{% else %}btn-outline-secondary{% endif %}">On the Way</a>
+    <a href="{% url 'ecomapp:vendororders' %}?status=Order+Completed" class="btn btn-sm {% if request.GET.status == 'Order Completed' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Completed</a>
+  </div>
+
+  <div class="table-responsive surface-card p-3">
+    <table class="table align-middle mb-0 vendor-table">
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Customer</th>
+          <th>Items</th>
+          <th>Order Status</th>
+          <th>Placed</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ord in orders %}
+        <tr>
+          <td><strong>#{{ ord.id }}</strong></td>
+          <td>
+            {{ ord.ordered_by }}<br>
+            <small class="text-muted">{{ ord.mobile }}</small>
+          </td>
+          <td>
+            {% with items=ord.cart.cartproduct_set.all %}
+              <span class="badge bg-secondary">{{ items|length }} item{{ items|length|pluralize }}</span>
+            {% endwith %}
+          </td>
+          <td>
+            <span class="badge {% if ord.order_status == 'Order Completed' %}bg-success{% elif ord.order_status == 'Order Received' %}bg-warning text-dark{% elif ord.order_status == 'Preparing' %}bg-info{% else %}bg-secondary{% endif %}">
+              {{ ord.order_status }}
+            </span>
+          </td>
+          <td><small>{{ ord.created_at|timesince }} ago</small></td>
+          <td><a href="{% url 'ecomapp:vendororderdetail' ord.pk %}" class="btn btn-sm btn-outline-primary">View</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6"><div class="empty-state"><h2>No orders found</h2></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

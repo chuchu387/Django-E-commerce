@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Server Error{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+  <section class="page-hero">
+    <div>
+      <span class="page-kicker">500</span>
+      <h1 class="page-title mb-0">Something went wrong</h1>
+      <p class="page-lede">The system could not complete this request. Please try again or contact support if it continues.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'ecomapp:home' %}">Go Home</a>
+  </section>
+</div>
+{% endblock %}

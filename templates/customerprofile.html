@@ -1,44 +1,101 @@
 {% extends 'base.html' %}
-
-{% block title %}My Profile {% endblock %}
+{% block title %}My Profile{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-4">
-            <h3>Detail Information</h3>
-            <p><span class="font-weight-bold">Name: </span>{{ customer.full_name }}</p>
-            <p><span class="font-weight-bold">Username: </span>{{ customer.user.username }}</p>
-            <p><span class="font-weight-bold">Email: </span>{{ customer.user.email }}</p>
-            <p><span class="font-weight-bold">Address: </span>{{ customer.address }}</p>
-            <p><span class="font-weight-bold">Joined On: </span>{{ customer.joined_on }}</p>
-        </div>
-        <div class="col-md-8">
-            <h3>Previous Order</h3>
-            <hr>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>SN</th>
-                        <th>Order ID</th>
-                        <th>Amount</th>
-                        <th>Ordered on</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for ord in orders %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td><a href="{% url 'ecomapp:customerorderdetail' ord.pk %}">ORDER_{{ ord.id }}</a> </td>
-                        <td>{{ ord.total }}</td>
-                        <td>{{ ord.created_at }} {{ ord.created_at|timesince }} ago  </td>
-                        <td>{{ ord.order_status }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<div class="page-shell">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Account</span>
+      <h1 class="page-title mb-0">Welcome, {{ customer.full_name }}</h1>
+      <p class="page-lede">Manage your account details and track previous orders.</p>
     </div>
+    <a class="btn btn-outline-primary" href="{% url 'ecomapp:products' %}">Browse Menu</a>
+  </header>
+
+  <div class="profile-grid">
+    <aside class="surface-card">
+      <span class="profile-avatar"><i class="fa fa-user"></i></span>
+      <h2 class="h4 fw-bold mb-3">Profile Details</h2>
+      <dl class="detail-list">
+        <div><dt>Name</dt><dd>{{ customer.full_name }}</dd></div>
+        <div><dt>Username</dt><dd>{{ customer.user.username }}</dd></div>
+        <div><dt>Email</dt><dd>{{ customer.user.email|default:"Not provided" }}</dd></div>
+        <div><dt>Address</dt><dd>{{ customer.address|default:"Not provided" }}</dd></div>
+        <div><dt>Joined</dt><dd>{{ customer.joined_on|date:"M d, Y" }}</dd></div>
+      </dl>
+      <div class="kpi-grid mt-3" style="grid-template-columns:1fr 1fr;">
+        <div class="kpi-card" style="padding:0.75rem;">
+          <span class="kpi-icon" style="font-size:1.25rem;">❤️</span>
+          <div>
+            <strong class="kpi-value" style="font-size:1rem;">{{ favorites_count }}</strong>
+            <span class="kpi-label">Favorites</span>
+          </div>
+        </div>
+        <div class="kpi-card" style="padding:0.75rem;">
+          <span class="kpi-icon" style="font-size:1.25rem;">📝</span>
+          <div>
+            <strong class="kpi-value" style="font-size:1rem;">{{ reviews_count }}</strong>
+            <span class="kpi-label">Reviews</span>
+          </div>
+        </div>
+      </div>
+      <div class="mt-3 d-grid gap-2">
+        <a href="{% url 'ecomapp:favorites' %}" class="btn btn-outline-primary btn-sm">View Favorites</a>
+        <a href="{% url 'ecomapp:addresses' %}" class="btn btn-outline-secondary btn-sm">Manage Addresses</a>
+        <a href="{% url 'ecomapp:customerlogout' %}" class="btn btn-outline-danger btn-sm">Logout</a>
+      </div>
+    </aside>
+
+    <section class="surface-card">
+      <div class="section-head">
+        <h2>Order History ({{ orders|length }})</h2>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Amount</th>
+              <th>Placed</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ord in orders %}
+              <tr>
+                <td><strong>#{{ ord.id }}</strong></td>
+                <td>Rs. {{ ord.total }}</td>
+                <td><small>{{ ord.created_at|timesince }} ago</small></td>
+                <td>
+                  <span class="badge
+                    {% if ord.order_status == 'Order Completed' %}bg-success
+                    {% elif ord.order_status == 'Order Cancelled' %}bg-danger
+                    {% elif ord.order_status == 'Order Received' %}bg-warning text-dark
+                    {% else %}bg-info{% endif %}">
+                    {{ ord.order_status }}
+                  </span>
+                </td>
+                <td>
+                  <a href="{% url 'ecomapp:customerorderdetail' ord.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                  <a href="{% url 'ecomapp:trackorder' ord.pk %}" class="btn btn-sm btn-outline-secondary">Track</a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5">
+                  <div class="empty-state">
+                    <h2>No orders yet</h2>
+                    <p>Your orders will appear here after checkout.</p>
+                    <a class="btn btn-primary" href="{% url 'ecomapp:products' %}">Browse Products</a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
 </div>
 {% endblock %}

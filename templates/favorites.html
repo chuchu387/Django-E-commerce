@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}My Favorites{% endblock %}
+
+{% block content %}
+<div class="page-shell">
+  {% csrf_token %}
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Favorites</span>
+      <h1 class="page-title mb-0">Saved items</h1>
+      <p class="page-lede">Quickly reorder your favorite dishes.</p>
+    </div>
+    <a class="btn btn-outline-primary" href="{% url 'ecomapp:products' %}">Browse Menu</a>
+  </header>
+
+  <div class="favorites-toolbar">
+    <span class="favorites-count">{{ favorites|length }} item{{ favorites|length|pluralize }} saved</span>
+    {% if favorites %}
+    <button class="btn btn-outline-danger btn-sm" id="clear-all-favs" data-url="{% url 'ecomapp:emptyfavorites' %}">Clear All</button>
+    {% endif %}
+  </div>
+
+  <div class="compact-product-grid">
+    {% for fav in favorites %}
+      <article class="product_card compact-product-card" data-fav-id="{{ fav.product.id }}">
+        <span class="fav-item-number">{{ forloop.counter }}</span>
+        <button class="fav-remove-btn" data-url="{% url 'ecomapp:removefavorite' fav.product.id %}" title="Remove from favorites" data-ajax="1">&times;</button>
+        <a class="product_image-wrapper" href="{% url 'ecomapp:productdetail' fav.product.slug %}">
+          <img src="{{ fav.product.image.url }}" alt="{{ fav.product.title }}">
+        </a>
+        <div class="product_card-body">
+          <p class="product_meta mb-1">{{ fav.product.category.title }}</p>
+          <h2 class="product_title h6 mb-2">
+            <a class="text-decoration-none" href="{% url 'ecomapp:productdetail' fav.product.slug %}">{{ fav.product.title }}</a>
+          </h2>
+          <p class="product_price mb-3 mt-auto">
+            <small class="text-muted text-decoration-line-through me-2">Rs. {{ fav.product.marked_price }}</small>
+            <strong>Rs. {{ fav.product.selling_price }}</strong>
+          </p>
+          <form action="{% url 'ecomapp:addtocart' fav.product.id %}" method="post" data-ajax="1">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary product_cta w-100">Add to Cart</button>
+          </form>
+        </div>
+      </article>
+    {% empty %}
+      <div class="empty-state">
+        <h2>No favorites yet</h2>
+        <p>Browse the menu and click the heart icon to save dishes for quick reorder.</p>
+        <a class="btn btn-primary" href="{% url 'ecomapp:products' %}">Browse Menu</a>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -15,7 +15,8 @@
             <th>Customer</th>
             <th>Ordered On</th>
             <th>Amount</th>
-            <th>Stats</th>
+            <th>Zone</th>
+            <th>Status</th>
 
           </tr>
         </thead>
@@ -27,6 +28,7 @@
             <td>{{order.ordered_by}}</td>
             <td>{{order.created_at}}</td>
             <td>{{order.total}}</td>
+            <td>{{order.delivery_zone|default:"—"}}</td>
             <td>{{order.order_status}}</td>
           </tr>
           {% endfor %}

@@ -1,12 +1,18 @@
 {% extends 'base.html' %}
-{% block title %}Our Products{% endblock %}
+{% block title %}Categories{% endblock %}
+{% block meta_description %}Browse BhokLagyao products by food category and quickly add meals to your cart.{% endblock %}
+{% block og_title %}BhokLagyao Categories{% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
-    <h1 class="page-title mb-0">Our Products</h1>
-    <p class="text-muted mb-0">Freshly curated cuisines across all categories.</p>
-  </div>
+<div class="page-shell">
+  <header class="page-hero">
+    <div>
+      <span class="page-kicker">Categories</span>
+      <h1 class="page-title mb-0">Browse meals by category</h1>
+      <p class="page-lede">Jump into appetizers, beverages, breakfast, desserts, and main menu items without losing the storefront flow.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'ecomapp:products' %}">View All Products</a>
+  </header>
 
   <nav class="category_nav mb-4" aria-label="Product categories">
     {% for category in categories %}
@@ -20,40 +26,42 @@
 
   {% for category in categories %}
     {% if category.prefetched_products %}
-      <section class="mb-5" id="category-{{ category.id }}">
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-          <h2 class="h4 mb-0">{{ category.title }}</h2>
+      <section class="category-section" id="category-{{ category.id }}">
+        <div class="section-head">
+          <h2>{{ category.title }}</h2>
           <span class="category_count-badge">{{ category.prefetched_products|length }} items</span>
         </div>
-        <div class="row g-4">
+        <div class="product-grid">
           {% for p in category.prefetched_products %}
-            <div class="col-sm-6 col-lg-4">
-              <article class="product_card h-100 p-3">
-                <div class="product_image-wrapper rounded-4">
-                  <a href="{% url 'ecomapp:productdetail' p.slug %}">
-                    <img src="{{ p.image.url }}" alt="{{ p.title }}" class="img-fluid">
-                  </a>
-                </div>
-                <div class="pt-3 d-flex flex-column h-100">
-                  <h3 class="product_title h5 mb-2">
-                    <a class="text-decoration-none" href="{% url 'ecomapp:productdetail' p.slug %}">{{ p.title }}</a>
-                  </h3>
-                  <p class="text-muted small mb-2">{{ p.category.title }}</p>
-                  <p class="product_price mb-2">
-                    <small class="text-muted text-decoration-line-through me-2">Rs. {{ p.marked_price }}</small>
-                    <strong>Rs. {{ p.selling_price }}</strong>
-                  </p>
-                  <p class="text-muted flex-grow-1">{{ p.description|truncatechars:100 }}</p>
-                  <a href="{% url 'ecomapp:addtocart' p.id %}" class="btn btn-primary product_cta mt-2">Add to Cart</a>
-                </div>
-              </article>
-            </div>
+            <article class="product_card">
+              <a class="product_image-wrapper" href="{% url 'ecomapp:productdetail' p.slug %}">
+                <img src="{{ p.image.url }}" alt="{{ p.title }}">
+              </a>
+              <div class="product_card-body">
+                <p class="product_meta mb-1">{{ p.category.title }}</p>
+                <h3 class="product_title h5 mb-2">
+                  <a class="text-decoration-none" href="{% url 'ecomapp:productdetail' p.slug %}">{{ p.title }}</a>
+                </h3>
+                <p class="product_desc mb-3">{{ p.description|truncatechars:92 }}</p>
+                <p class="product_price mb-3 mt-auto">
+                  <small class="text-muted text-decoration-line-through me-2">Rs. {{ p.marked_price }}</small>
+                  <strong>Rs. {{ p.selling_price }}</strong>
+                </p>
+                <form action="{% url 'ecomapp:addtocart' p.id %}" method="post" class="add-to-cart-form" data-ajax="1">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-primary product_cta w-100" data-loading-text="Adding...">Add to Cart</button>
+                </form>
+              </div>
+            </article>
           {% endfor %}
         </div>
       </section>
     {% endif %}
   {% empty %}
-    <p class="text-center text-muted mt-4">No products available.</p>
+    <div class="empty-state">
+      <h2>No categories available yet</h2>
+      <p>Add menu categories and products from the admin dashboard to publish this page.</p>
+    </div>
   {% endfor %}
 </div>
 {% endblock %}
