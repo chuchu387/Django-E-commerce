@@ -1,0 +1,3 @@
+[flake8]
+per-file-ignores =
+    ecomapp/views.py:F821
